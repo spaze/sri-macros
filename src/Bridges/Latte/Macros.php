@@ -35,12 +35,21 @@ class Macros
 		$url = $this->sriConfig->getUrl($resource);
 		$hash = $this->sriConfig->getHash($resource);
 
+		$attributes = '';
+		while ($words = $node->tokenizer->fetchWords()) {
+			if (count($words) > 1) {
+				$attributes .= " . ' ' . %escape('{$words[0]}') . '=\"' . %escape('{$words[1]}') . '\"'";
+			} else {
+				$attributes .= " . ' ' . %escape('{$words[0]}')";
+			}
+		}
+
 		return $writer->write(
-			'echo \'<script src="\' . %escape(\''
-			. $url
-			. '\') . \'" integrity="'
-			. $hash
-			. '" crossorigin="anonymous"></script>\';'
+			"echo '<script"
+			. " src=\"' . %escape('" . $url . "') . '\""
+			. " integrity=\"' . %escape('" . $hash . "') . '\"'"
+			. $attributes
+			. " . '></script>';"
 		);
 	}
 
