@@ -35,7 +35,13 @@ class Macros
 		$url = $this->sriConfig->getUrl($resource);
 		$hash = $this->sriConfig->getHash($resource);
 
-		return $writer->write('echo \'<script src="\' . %escape(\'' . $url . '\') . \'" integrity="' . $hash . '"></script>\';');
+		return $writer->write(
+			'echo \'<script src="\' . %escape(\''
+			. $url
+			. '\') . \'" integrity="'
+			. $hash
+			. '" crossorigin="anonymous"></script>\';'
+		);
 	}
 
 }
