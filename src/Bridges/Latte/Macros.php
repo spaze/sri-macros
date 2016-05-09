@@ -38,9 +38,10 @@ class Macros
 		$attributes = '';
 		while ($words = $node->tokenizer->fetchWords()) {
 			if (count($words) > 1) {
-				$attributes .= " . ' ' . %escape('{$words[0]}') . '=\"' . %escape('{$words[1]}') . '\"'";
+				$attributes .= " . ' ' . %escape(" . $this->getValue($words[0]) . ")"
+					. " . '=\"' . %escape(" . $this->getValue($words[1]) . ") . '\"'";
 			} else {
-				$attributes .= " . ' ' . %escape('{$words[0]}')";
+				$attributes .= " . ' ' . %escape(" . $this->getValue($words[0]) . ")";
 			}
 		}
 
@@ -51,6 +52,12 @@ class Macros
 			. $attributes
 			. " . '></script>';"
 		);
+	}
+
+
+	private function getValue($token)
+	{
+		return (isset($token[0]) && $token[0] === '$' ? $token : "'{$token}'");
 	}
 
 }
