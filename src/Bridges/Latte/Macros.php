@@ -8,12 +8,23 @@ class Macros
 	private $sriConfig;
 
 
+	/**
+	 * Constructor.
+	 *
+	 * @param \Spaze\SubresourceIntegrity\Config $sriConfig
+	 */
 	public function __construct(\Spaze\SubresourceIntegrity\Config $sriConfig)
 	{
 		$this->sriConfig = $sriConfig;
 	}
 
 
+	/**
+	 * Install macros.
+	 *
+	 * @param \Latte\Compiler $compiler
+	 * @return \Latte\Macros\MacroSet
+	 */
 	public function install(\Latte\Compiler $compiler)
 	{
 		$set = new \Latte\Macros\MacroSet($compiler);
@@ -24,6 +35,10 @@ class Macros
 
 	/**
 	 * {script ...}
+	 *
+	 * @param \Latte\MacroNode $node
+	 * @param \Latte\PhpWriter $writer
+	 * @return string
 	 */
 	public function macroScript(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
 	{
@@ -55,6 +70,12 @@ class Macros
 	}
 
 
+	/**
+	 * Get variable value or string for non-variables.
+	 *
+	 * @param string $token
+	 * @return string
+	 */
 	private function getValue($token)
 	{
 		return (isset($token[0]) && $token[0] === '$' ? $token : "'{$token}'");

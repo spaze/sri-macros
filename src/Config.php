@@ -19,18 +19,34 @@ class Config
 	protected $localPrefix = array();
 
 
+	/**
+	 * Set resources.
+	 *
+	 * @param array $resources
+	 */
 	public function setResources(array $resources)
 	{
 		$this->resources = $resources;
 	}
 
 
+	/**
+	 * Set prefix for local resources.
+	 *
+	 * @param string $prefix
+	 */
 	public function setLocalPrefix($prefix)
 	{
 		$this->localPrefix = $prefix;
 	}
 
 
+	/**
+	 * Get full URL for a resource.
+	 *
+	 * @param string $resource
+	 * @return string
+	 */
 	public function getUrl($resource)
 	{
 		if (is_array($this->resources[$resource])) {
@@ -45,6 +61,12 @@ class Config
 	}
 
 
+	/**
+	 * Get SRI hash for a resource.
+	 *
+	 * @param string $resource
+	 * @return string
+	 */
 	public function getHash($resource)
 	{
 		if (is_array($this->resources[$resource])) {
