@@ -51,12 +51,23 @@ class Macros
 		$hash = $this->sriConfig->getHash($resource);
 
 		$attributes = '';
-		while ($words = $node->tokenizer->fetchWords()) {
-			if (count($words) > 1) {
-				$attributes .= " . ' ' . %escape(" . $this->getValue($words[0]) . ")"
-					. " . '=\"' . %escape(" . $this->getValue($words[1]) . ") . '\"'";
-			} else {
-				$attributes .= " . ' ' . %escape(" . $this->getValue($words[0]) . ")";
+		$isAttrName = true;
+		while ($node->tokenizer->nextToken()) {
+			if ($node->tokenizer->isCurrent(\Latte\MacroTokens::T_SYMBOL, \Latte\MacroTokens::T_VARIABLE)) {
+				$attributes .= " . '" . ($isAttrName ? ' ' : '"') . "'";
+				if ($node->tokenizer->currentToken()[\Latte\Tokenizer::TYPE] === \Latte\MacroTokens::T_VARIABLE) {
+					$attributes .= ' . %escape(' . $node->tokenizer->currentValue() . ')';
+				} else {
+					$attributes .= " . %escape('" . $node->tokenizer->currentValue() . "')";
+				}
+				$attributes .= ($isAttrName ? '' : " . '\"'");
+			} elseif ($node->tokenizer->isCurrent('=', '=>')) {
+				$attributes .= " . '='";
+				$isAttrName = false;
+			} elseif ($node->tokenizer->isCurrent(',')) {
+				$isAttrName = true;
+			} elseif (!$node->tokenizer->isCurrent(\Latte\MacroTokens::T_WHITESPACE)) {
+				throw new \Latte\CompileException("Unexpected '{$node->tokenizer->currentValue()}' in {script $node->args}");
 			}
 		}
 
@@ -67,18 +78,6 @@ class Macros
 			. $attributes
 			. " . '></script>';"
 		);
-	}
-
-
-	/**
-	 * Get variable value or string for non-variables.
-	 *
-	 * @param string $token
-	 * @return string
-	 */
-	private function getValue($token)
-	{
-		return (isset($token[0]) && $token[0] === '$' ? $token : "'{$token}'");
 	}
 
 }
