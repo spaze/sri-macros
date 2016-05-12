@@ -9,14 +9,14 @@ namespace Spaze\SubresourceIntegrity;
 class Config
 {
 
-	/** @internal hash algorithm */
-	const HASH_ALGO = 'sha256';
-
 	/** @var array of key => array of resources */
 	protected $resources = array();
 
 	/** @var array of (url => prefix, path => prefix) */
 	protected $localPrefix = array();
+
+	/** @var array of hashing algorithms */
+	protected $hashingAlgos = array();
 
 
 	/**
@@ -38,6 +38,17 @@ class Config
 	public function setLocalPrefix($prefix)
 	{
 		$this->localPrefix = $prefix;
+	}
+
+
+	/**
+	 * Set one or more hashing algorithms.
+	 *
+	 * @param string|array $algos
+	 */
+	public function setHashingAlgos($algos)
+	{
+		$this->hashingAlgos = (array)$algos;
 	}
 
 
@@ -65,7 +76,7 @@ class Config
 	 * Get SRI hash for a resource.
 	 *
 	 * @param string $resource
-	 * @return string
+	 * @return array
 	 */
 	public function getHash($resource)
 	{
@@ -81,7 +92,11 @@ class Config
 				trim($this->localPrefix['path'], '/'),
 				ltrim($this->resources[$resource], '/')
 			);
-			$hash = self::HASH_ALGO . '-' . base64_encode(hash_file(self::HASH_ALGO, $file, true));
+			$fileHashes = array();
+			foreach ($this->hashingAlgos as $algo) {
+				$fileHashes[] = $algo . '-' . base64_encode(hash_file($algo, $file, true));
+			}
+			$hash = implode(' ', $fileHashes);
 		}
 		return $hash;
 	}

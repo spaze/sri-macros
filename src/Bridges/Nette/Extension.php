@@ -16,6 +16,7 @@ class Extension extends \Nette\DI\CompilerExtension
 			'url' => '',
 			'path' => '',
 		),
+		'hashingAlgos' => 'sha256',
 	);
 
 
@@ -27,7 +28,8 @@ class Extension extends \Nette\DI\CompilerExtension
 		$sriConfig = $builder->addDefinition($this->prefix('config'))
 			->setClass(\Spaze\SubresourceIntegrity\Config::class)
 			->addSetup('setResources', array($config['resources']))
-			->addSetup('setLocalPrefix', array($config['localPrefix']));
+			->addSetup('setLocalPrefix', array($config['localPrefix']))
+			->addSetup('setHashingAlgos', array($config['hashingAlgos']));
 
 		$macros = $builder->addDefinition($this->prefix('macros'))
 			->setClass(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class);
