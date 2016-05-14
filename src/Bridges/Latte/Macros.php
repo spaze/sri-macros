@@ -29,6 +29,7 @@ class Macros
 	{
 		$set = new \Latte\Macros\MacroSet($compiler);
 		$set->addMacro('script', array($this, 'macroScript'));
+		$set->addMacro('stylesheet', array($this, 'macroStylesheet'));
 		return $set;
 	}
 
@@ -56,6 +57,33 @@ class Macros
 			. " integrity=\"' . %escape('" . $hash . "') . '\"'"
 			. $this->buildAttributes($node->tokenizer)
 			. " . '></script>';"
+		);
+	}
+
+
+	/**
+	 * {stylesheet ...}
+	 *
+	 * @param \Latte\MacroNode $node
+	 * @param \Latte\PhpWriter $writer
+	 * @return string
+	 */
+	public function macroStylesheet(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
+	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
+
+		$resource = $node->tokenizer->fetchWord();
+		$url = $this->sriConfig->getUrl($resource);
+		$hash = $this->sriConfig->getHash($resource);
+
+		return $writer->write(
+			"echo '<link rel=\"stylesheet\""
+			. " href=\"' . %escape('" . $url . "') . '\""
+			. " integrity=\"' . %escape('" . $hash . "') . '\"'"
+			. $this->buildAttributes($node->tokenizer)
+			. " . '>';"
 		);
 	}
 
