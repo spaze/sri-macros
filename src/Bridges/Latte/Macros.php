@@ -50,34 +50,53 @@ class Macros
 		$url = $this->sriConfig->getUrl($resource);
 		$hash = $this->sriConfig->getHash($resource);
 
-		$attributes = '';
-		$isAttrName = true;
-		while ($node->tokenizer->nextToken()) {
-			if ($node->tokenizer->isCurrent(\Latte\MacroTokens::T_SYMBOL, \Latte\MacroTokens::T_VARIABLE)) {
-				$attributes .= " . '" . ($isAttrName ? ' ' : '"') . "'";
-				if ($node->tokenizer->currentToken()[\Latte\Tokenizer::TYPE] === \Latte\MacroTokens::T_VARIABLE) {
-					$attributes .= ' . %escape(' . $node->tokenizer->currentValue() . ')';
-				} else {
-					$attributes .= " . %escape('" . $node->tokenizer->currentValue() . "')";
-				}
-				$attributes .= ($isAttrName ? '' : " . '\"'");
-			} elseif ($node->tokenizer->isCurrent('=', '=>')) {
-				$attributes .= " . '='";
-				$isAttrName = false;
-			} elseif ($node->tokenizer->isCurrent(',')) {
-				$isAttrName = true;
-			} elseif (!$node->tokenizer->isCurrent(\Latte\MacroTokens::T_WHITESPACE)) {
-				throw new \Latte\CompileException("Unexpected '{$node->tokenizer->currentValue()}' in {script $node->args}");
-			}
-		}
-
 		return $writer->write(
 			"echo '<script"
 			. " src=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\"'"
-			. $attributes
+			. $this->buildAttributes($node->tokenizer)
 			. " . '></script>';"
 		);
+	}
+
+
+	/**
+	 * Build attributes.
+	 *
+	 * @param \Latte\MacroTokens $tokens
+	 * @return string
+	 */
+	private function buildAttributes(\Latte\MacroTokens $tokens)
+	{
+		$attributes = array("'crossorigin'" => "'anonymous'");
+		$isAttrName = true;
+		$attrName = $attrValue = null;
+		while ($tokens->nextToken()) {
+			if ($tokens->isCurrent(\Latte\MacroTokens::T_SYMBOL, \Latte\MacroTokens::T_VARIABLE)) {
+				${$isAttrName ? 'attrName' : 'attrValue'} = ($tokens->isCurrent(\Latte\MacroTokens::T_VARIABLE) ? $tokens->currentValue() : "'{$tokens->currentValue()}'");
+			} elseif ($tokens->isCurrent('=', '=>')) {
+				$isAttrName = false;
+			} elseif ($tokens->isCurrent(',')) {
+				$attributes[$attrName] = ($attrValue ?: null);
+				$isAttrName = true;
+				$attrName = $attrValue = null;
+			} elseif (!$tokens->isCurrent(\Latte\MacroTokens::T_WHITESPACE)) {
+				throw new \Latte\CompileException("Unexpected '{$tokens->currentValue()}' in {script $node->args}");
+			}
+			if (!$tokens->isNext()) {
+				$attributes[$attrName] = ($attrValue ?: null);
+			}
+		}
+
+		$attrCode = '';
+		foreach ($attributes as $name => $value) {
+			$attrCode .= " . ' ' . %escape(" . $name . ")";
+			if ($value !== null) {
+				$attrCode .= " . '=\"' . %escape(" . $value . ") . '\"'";
+			}
+		}
+
+		return $attrCode;
 	}
 
 }
