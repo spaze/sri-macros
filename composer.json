@@ -11,5 +11,8 @@
 	],
 	"autoload": {
 		"psr-4": {"Spaze\\SubresourceIntegrity\\": "src"}
+	},
+	"require-dev": {
+		"nette/tester": "^1.7"
 	}
 }
