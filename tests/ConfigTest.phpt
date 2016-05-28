@@ -33,6 +33,30 @@ class ConfigTest extends Tester\TestCase
 		Assert::same('/chuck/norris/waldo/quux.js', $config->getUrl('bar'));
 	}
 
+
+	public function testGetHash()
+	{
+		$config = new Config();
+		$config->setHashingAlgos('sha256');
+		$config->setLocalPrefix(['path' => '.']);
+		$config->setResources(['foo' => '/foo.js']);
+		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+	}
+
+
+	public function testGetMultipleHashes()
+	{
+		$config = new Config();
+		$config->setHashingAlgos(['sha256', 'sha512']);
+		$config->setLocalPrefix(['path' => 'foo/../']);
+		$config->setResources(['foo' => 'foo.js']);
+		$hashes = [
+			'sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=',
+			'sha512-Ya/YX2JNDJkMuwnP7Og+2HpkYVwwBaUXRk1pRbyp6kYhnlTNKnTlVGi/KLsGnZETuK+TBHhA4itCCy1/74UTvg=='
+		];
+		Assert::same(implode(' ', $hashes), $config->getHash('foo'));
+	}
+
 }
 
 $testCase = new ConfigTest();
