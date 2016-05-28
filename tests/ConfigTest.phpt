@@ -57,6 +57,45 @@ class ConfigTest extends Tester\TestCase
 		Assert::same(implode(' ', $hashes), $config->getHash('foo'));
 	}
 
+
+	public function testGetRemoteUrl()
+	{
+		$config = new Config();
+		$config->setResources(['foo' => ['url' => 'pluto://goofy']]);
+		Assert::same('pluto://goofy', $config->getUrl('foo'));
+	}
+
+
+	public function testGetRemoteHash()
+	{
+		$config = new Config();
+		$config->setResources([
+			'foo' => [
+				'url' => 'pluto://goofy',
+				'hash' => 'sha123-pluto'
+			],
+		]);
+		Assert::same('pluto://goofy', $config->getUrl('foo'));
+		Assert::same('sha123-pluto', $config->getHash('foo'));
+	}
+
+
+	public function testGetMultipleRemoteHashes()
+	{
+		$config = new Config();
+		$config->setResources([
+			'foo' => [
+				'url' => 'pluto://goofy',
+				'hash' => [
+					'sha123-pluto',
+					'sha246-goofy',
+				],
+			],
+		]);
+		Assert::same('pluto://goofy', $config->getUrl('foo'));
+		Assert::same('sha123-pluto sha246-goofy', $config->getHash('foo'));
+	}
+
 }
 
 $testCase = new ConfigTest();
