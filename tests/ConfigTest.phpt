@@ -9,12 +9,16 @@
  */
 
 use Spaze\SubresourceIntegrity\Config;
+use Spaze\SubresourceIntegrity\Exceptions;
 use Tester\Assert;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 class ConfigTest extends Tester\TestCase
 {
+
+	public $tempDir;
+
 
 	public function testGetUrl()
 	{
@@ -96,7 +100,49 @@ class ConfigTest extends Tester\TestCase
 		Assert::same('sha123-pluto sha246-goofy', $config->getHash('foo'));
 	}
 
+
+	public function testUnknownLocalMode()
+	{
+		$config = new Config();
+		$config->setHashingAlgos('sha256');
+		$config->setLocalPrefix(['path' => '.']);
+		$config->setResources(['foo' => '/foo.js']);
+		$config->setLocalMode('direct');
+		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+		$config->setLocalMode('foo');
+		Assert::exception(function() use ($config) {
+			Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+		}, Exceptions\UnknownModeException::class);
+	}
+
+
+	public function testBuildLocalMode()
+	{
+		$config = new Config();
+		$config->setHashingAlgos('sha256');
+		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$config->setResources(['foo' => '/foo.js']);
+		$config->setLocalMode('build');
+		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+		Assert::true(file_exists($this->tempDir . '/VW3caaddC-Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY.js'));
+	}
+
+
+	public function testBuildLocalModeNonExistingDir()
+	{
+		$config = new Config();
+		$config->setHashingAlgos('sha256');
+		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests/does/not/exist']);
+		$config->setResources(['foo' => '/foo.js']);
+		$config->setLocalMode('build');
+		Assert::exception(function() use ($config) {
+			Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+		}, Exceptions\DirectoryNotWritableException::class);
+	}
+
 }
 
 $testCase = new ConfigTest();
+$testCase->tempDir = __DIR__ . '/../temp/tests';
+Tester\Helpers::purge($testCase->tempDir);
 $testCase->run();

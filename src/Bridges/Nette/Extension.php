@@ -29,6 +29,7 @@ class Extension extends \Nette\DI\CompilerExtension
 			->setClass(\Spaze\SubresourceIntegrity\Config::class)
 			->addSetup('setResources', array($config['resources']))
 			->addSetup('setLocalPrefix', array($config['localPrefix']))
+			->addSetup('setLocalMode', array($config['localMode']))
 			->addSetup('setHashingAlgos', array($config['hashingAlgos']));
 
 		$macros = $builder->addDefinition($this->prefix('macros'))
