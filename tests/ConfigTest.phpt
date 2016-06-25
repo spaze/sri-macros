@@ -10,6 +10,7 @@
 
 use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\Exceptions;
+use Spaze\SubresourceIntegrity\FileBuilder;
 use Tester\Assert;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -20,9 +21,16 @@ class ConfigTest extends Tester\TestCase
 	public $tempDir;
 
 
+	private function getConfig()
+	{
+		$config = new Config(new FileBuilder());
+		return $config;
+	}
+
+
 	public function testGetUrl()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setLocalPrefix([
 			'url' => '/chuck/norris/',
 		]);
@@ -40,7 +48,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testGetHash()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setHashingAlgos('sha256');
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo' => '/foo.js']);
@@ -50,7 +58,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testGetMultipleHashes()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setHashingAlgos(['sha256', 'sha512']);
 		$config->setLocalPrefix(['path' => 'foo/../']);
 		$config->setResources(['foo' => 'foo.js']);
@@ -64,7 +72,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testGetRemoteUrl()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setResources(['foo' => ['url' => 'pluto://goofy']]);
 		Assert::same('pluto://goofy', $config->getUrl('foo'));
 	}
@@ -72,7 +80,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testGetRemoteHash()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setResources([
 			'foo' => [
 				'url' => 'pluto://goofy',
@@ -86,7 +94,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testGetMultipleRemoteHashes()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setResources([
 			'foo' => [
 				'url' => 'pluto://goofy',
@@ -103,7 +111,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testUnknownLocalMode()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setHashingAlgos('sha256');
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo' => '/foo.js']);
@@ -118,7 +126,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testBuildLocalMode()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setHashingAlgos('sha256');
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
 		$config->setResources(['foo' => '/foo.js']);
@@ -130,7 +138,7 @@ class ConfigTest extends Tester\TestCase
 
 	public function testBuildLocalModeNonExistingDir()
 	{
-		$config = new Config();
+		$config = $this->getConfig();
 		$config->setHashingAlgos('sha256');
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests/does/not/exist']);
 		$config->setResources(['foo' => '/foo.js']);

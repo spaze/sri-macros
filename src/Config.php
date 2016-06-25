@@ -15,6 +15,9 @@ class Config
 	/** @internal build local files, new file for every new resource version */
 	const MODE_BUILD = 'build';
 
+	/** @var FileBuilder */
+	private $fileBuilder;
+
 	/** @var array of key => array of resources */
 	protected $resources = array();
 
@@ -30,6 +33,11 @@ class Config
 	/** @var array of resource => \stdClass (hash, filename) */
 	protected $localResources = array();
 
+
+	public function __construct(FileBuilder $fileBuilder)
+	{
+		$this->fileBuilder = $fileBuilder;
+	}
 
 	/**
 	 * Set resources.
@@ -130,10 +138,12 @@ class Config
 		if (empty($this->localResources[$this->localMode][$resource])) {
 			switch ($this->localMode) {
 				case self::MODE_DIRECT:
-					$data = $this->directFile($resource);
+					$data = new \stdClass();
+					$data->url = ltrim($this->resources[$resource], '/');
+					$data->filename = sprintf('%s/%s/%s', rtrim(getcwd(), '/'), trim($this->localPrefix['path'], '/'), $data->url);
 					break;
 				case self::MODE_BUILD:
-					$data = $this->buildFile($resource);
+					$data = $this->fileBuilder->build($this->resources[$resource], $this->localPrefix['path'], $this->localPrefix['build']);
 					break;
 				default:
 					throw new Exceptions\UnknownModeException('Unknown local file mode: ' . $this->localMode);
@@ -142,56 +152,6 @@ class Config
 			$this->localResources[$this->localMode][$resource] = $data;
 		}
 		return $this->localResources[$this->localMode][$resource];
-	}
-
-
-	/**
-	 * Get direct file mode data.
-	 * @param string $resource
-	 * @return \stdClass
-	 */
-	private function directFile($resource)
-	{
-		$data = new \stdClass();
-		$data->url = ltrim($this->resources[$resource], '/');
-		$data->filename = sprintf('%s/%s/%s', rtrim(getcwd(), '/'), trim($this->localPrefix['path'], '/'), $data->url);
-		return $data;
-	}
-
-
-	/**
-	 * Get build file mode data.
-	 * @param string $resource
-	 * @return \stdClass
-	 */
-	private function buildFile($resource)
-	{
-		$localFilename = sprintf('%s/%s/%s',
-			rtrim(getcwd(), '/'),
-			trim($this->localPrefix['path'], '/'),
-			ltrim($this->resources[$resource], '/')
-		);
-		$build = sprintf('%s/%s.%s',
-			trim($this->localPrefix['build'], '/'),
-			rtrim(strtr(base64_encode(hash_file('sha256', $localFilename, true)), '+/', '-_'), '='),  // Encoded to base64url, see https://tools.ietf.org/html/rfc4648#section-5
-			pathinfo($localFilename, PATHINFO_EXTENSION)
-		);
-		$buildFilename = sprintf('%s/%s/%s',
-			rtrim(getcwd(), '/'),
-			trim($this->localPrefix['path'], '/'),
-			$build
-		);
-
-		if (!is_writable(dirname($buildFilename))) {
-			throw new Exceptions\DirectoryNotWritableException('Directory ' . dirname($buildFilename) . " doesn't exist or isn't writable");
-		}
-
-		copy($localFilename, $buildFilename);
-
-		$data = new \stdClass();
-		$data->url = $build;
-		$data->filename = $buildFilename;
-		return $data;
 	}
 
 }

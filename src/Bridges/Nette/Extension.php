@@ -34,6 +34,9 @@ class Extension extends \Nette\DI\CompilerExtension
 
 		$macros = $builder->addDefinition($this->prefix('macros'))
 			->setClass(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class);
+
+		$macros = $builder->addDefinition($this->prefix('fileBuilder'))
+			->setClass(\Spaze\SubresourceIntegrity\FileBuilder::class);
 	}
 
 
