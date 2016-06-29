@@ -148,6 +148,29 @@ class ConfigTest extends Tester\TestCase
 		}, Exceptions\DirectoryNotWritableException::class);
 	}
 
+
+	public function testDirectLocalModePlusSign()
+	{
+		$config = $this->getConfig();
+		$config->setHashingAlgos('sha256');
+		$config->setLocalPrefix(['path' => '.']);
+		$config->setResources(['foo+bar' => '/foo.js']);
+		$config->setLocalMode('direct');
+		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo+bar'));
+	}
+
+
+	public function testBuildLocalModePlusSign()
+	{
+		$config = $this->getConfig();
+		$config->setHashingAlgos('sha256');
+		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
+		$config->setLocalMode('build');
+		Assert::same('sha256-JVfM7rc8NwU7pFP1p7p4YJBW++QdyCbSnjq7AO4UIVg=', $config->getHash('foo+waldo'));
+		Assert::true(file_exists($this->tempDir . '/JVfM7rc8NwU7pFP1p7p4YJBW--QdyCbSnjq7AO4UIVg.js'));
+	}
+
 }
 
 $testCase = new ConfigTest();

@@ -15,6 +15,9 @@ class Config
 	/** @internal build local files, new file for every new resource version */
 	const MODE_BUILD = 'build';
 
+	/** @internal separator between multiple resources */
+	const BUILD_SEPARATOR = '+';
+
 	/** @var FileBuilder */
 	private $fileBuilder;
 
@@ -91,7 +94,7 @@ class Config
 	 */
 	public function getUrl($resource)
 	{
-		if (is_array($this->resources[$resource])) {
+		if (!$this->isCombo($resource) && is_array($this->resources[$resource])) {
 			$url = $this->resources[$resource]['url'];
 		} else {
 			$url = sprintf('%s/%s',
@@ -111,7 +114,7 @@ class Config
 	 */
 	public function getHash($resource)
 	{
-		if (is_array($this->resources[$resource])) {
+		if (!$this->isCombo($resource) && is_array($this->resources[$resource])) {
 			if (is_array($this->resources[$resource]['hash'])) {
 				$hash = implode(' ', $this->resources[$resource]['hash']);
 			} else {
@@ -130,6 +133,7 @@ class Config
 
 	/**
 	 * Get local file data.
+	 *
 	 * @param string $resource
 	 * @return \stdClass
 	 */
@@ -143,7 +147,11 @@ class Config
 					$data->filename = sprintf('%s/%s/%s', rtrim(getcwd(), '/'), trim($this->localPrefix['path'], '/'), $data->url);
 					break;
 				case self::MODE_BUILD:
-					$data = $this->fileBuilder->build($this->resources[$resource], $this->localPrefix['path'], $this->localPrefix['build']);
+					$resources = [];
+					foreach (explode(self::BUILD_SEPARATOR, $resource) as $value) {
+						$resources[] = $this->resources[$value];
+					}
+					$data = $this->fileBuilder->build($resources, $this->localPrefix['path'], $this->localPrefix['build']);
 					break;
 				default:
 					throw new Exceptions\UnknownModeException('Unknown local file mode: ' . $this->localMode);
@@ -152,6 +160,18 @@ class Config
 			$this->localResources[$this->localMode][$resource] = $data;
 		}
 		return $this->localResources[$this->localMode][$resource];
+	}
+
+
+	/**
+	 * Whether the resource is a combination one (e.g. foo+bar).
+	 *
+	 * @param string $resource
+	 * @return boolean
+	 */
+	private function isCombo($resource)
+	{
+		return (strpos($resource, self::BUILD_SEPARATOR) !== false);
 	}
 
 }
