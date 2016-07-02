@@ -55,7 +55,7 @@ class Macros
 			"echo '<script"
 			. " src=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\"'"
-			. $this->buildAttributes($node->tokenizer)
+			. $this->buildAttributes('script', $node)
 			. " . '></script>';"
 		);
 	}
@@ -82,7 +82,7 @@ class Macros
 			"echo '<link rel=\"stylesheet\""
 			. " href=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\"'"
-			. $this->buildAttributes($node->tokenizer)
+			. $this->buildAttributes('stylesheet', $node)
 			. " . '>';"
 		);
 	}
@@ -91,27 +91,28 @@ class Macros
 	/**
 	 * Build attributes.
 	 *
-	 * @param \Latte\MacroTokens $tokens
+	 * @param string $macro
+	 * @param \Latte\MacroNode $node
 	 * @return string
 	 */
-	private function buildAttributes(\Latte\MacroTokens $tokens)
+	private function buildAttributes($macro, \Latte\MacroNode $node)
 	{
 		$attributes = array("'crossorigin'" => "'anonymous'");
 		$isAttrName = true;
 		$attrName = $attrValue = null;
-		while ($tokens->nextToken()) {
-			if ($tokens->isCurrent(\Latte\MacroTokens::T_SYMBOL, \Latte\MacroTokens::T_VARIABLE)) {
-				${$isAttrName ? 'attrName' : 'attrValue'} = ($tokens->isCurrent(\Latte\MacroTokens::T_VARIABLE) ? $tokens->currentValue() : "'{$tokens->currentValue()}'");
-			} elseif ($tokens->isCurrent('=', '=>')) {
+		while ($node->tokenizer->nextToken()) {
+			if ($node->tokenizer->isCurrent(\Latte\MacroTokens::T_SYMBOL, \Latte\MacroTokens::T_VARIABLE)) {
+				${$isAttrName ? 'attrName' : 'attrValue'} = ($node->tokenizer->isCurrent(\Latte\MacroTokens::T_VARIABLE) ? $node->tokenizer->currentValue() : "'{$node->tokenizer->currentValue()}'");
+			} elseif ($node->tokenizer->isCurrent('=', '=>')) {
 				$isAttrName = false;
-			} elseif ($tokens->isCurrent(',')) {
+			} elseif ($node->tokenizer->isCurrent(',')) {
 				$attributes[$attrName] = ($attrValue ?: null);
 				$isAttrName = true;
 				$attrName = $attrValue = null;
-			} elseif (!$tokens->isCurrent(\Latte\MacroTokens::T_WHITESPACE)) {
-				throw new \Latte\CompileException("Unexpected '{$tokens->currentValue()}' in {script $node->args}");
+			} elseif (!$node->tokenizer->isCurrent(\Latte\MacroTokens::T_WHITESPACE)) {
+				throw new \Latte\CompileException("Unexpected '{$node->tokenizer->currentValue()}' in {{$macro} {$node->args}}");
 			}
-			if (!$tokens->isNext()) {
+			if (!$node->tokenizer->isNext()) {
 				$attributes[$attrName] = ($attrValue ?: null);
 			}
 		}
