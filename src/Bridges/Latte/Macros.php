@@ -30,7 +30,6 @@ class Macros
 		$set = new \Latte\Macros\MacroSet($compiler);
 		$set->addMacro('script', array($this, 'macroScript'));
 		$set->addMacro('stylesheet', array($this, 'macroStylesheet'));
-		$set->addMacro('preload', array($this, 'macroPreload'));
 		return $set;
 	}
 
@@ -90,42 +89,15 @@ class Macros
 
 
 	/**
-	 * {preload ...}
-	 *
-	 * @param \Latte\MacroNode $node
-	 * @param \Latte\PhpWriter $writer
-	 * @return string
-	 */
-	public function macroPreload(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
-	{
-		if ($node->modifiers) {
-			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
-		}
-
-		$resource = $node->tokenizer->fetchWord();
-		$url = $this->sriConfig->getUrl($resource);
-		$hash = $this->sriConfig->getHash($resource);
-
-		return $writer->write(
-			"echo '<link rel=\"preload\""
-			. " href=\"' . %escape('" . $url . "') . '\""
-			. " integrity=\"' . %escape('" . $hash . "') . '\"'"
-			. $this->buildAttributes('preload', $node, [])
-			. " . '>';"
-		);
-	}
-
-
-	/**
 	 * Build attributes.
 	 *
 	 * @param string $macro
 	 * @param \Latte\MacroNode $node
-	 * @param array $attributes
 	 * @return string
 	 */
-	private function buildAttributes($macro, \Latte\MacroNode $node, $attributes = array("'crossorigin'" => "'anonymous'"))
+	private function buildAttributes($macro, \Latte\MacroNode $node)
 	{
+		$attributes = array("'crossorigin'" => "'anonymous'");
 		$isAttrName = true;
 		$attrName = $attrValue = null;
 		while ($node->tokenizer->nextToken()) {
