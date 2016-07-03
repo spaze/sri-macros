@@ -30,6 +30,8 @@ class Macros
 		$set = new \Latte\Macros\MacroSet($compiler);
 		$set->addMacro('script', array($this, 'macroScript'));
 		$set->addMacro('stylesheet', array($this, 'macroStylesheet'));
+		$set->addMacro('resourceurl', array($this, 'macroResourceUrl'));
+		$set->addMacro('resourcehash', array($this, 'macroResourceHash'));
 		return $set;
 	}
 
@@ -85,6 +87,46 @@ class Macros
 			. $this->buildAttributes('stylesheet', $node)
 			. " . '>';"
 		);
+	}
+
+
+	/**
+	 * {resourceurl ...}
+	 *
+	 * @param \Latte\MacroNode $node
+	 * @param \Latte\PhpWriter $writer
+	 * @return string
+	 */
+	public function macroResourceUrl(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
+	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
+
+		$resource = $node->tokenizer->fetchWord();
+		$url = $this->sriConfig->getUrl($resource);
+
+		return $writer->write("echo %escape('" . $url . "');");
+	}
+
+
+	/**
+	 * {resourcehash ...}
+	 *
+	 * @param \Latte\MacroNode $node
+	 * @param \Latte\PhpWriter $writer
+	 * @return string
+	 */
+	public function macroResourceHash(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
+	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
+
+		$resource = $node->tokenizer->fetchWord();
+		$hash = $this->sriConfig->getHash($resource);
+
+		return $writer->write("echo %escape('" . $hash . "');");
 	}
 
 
