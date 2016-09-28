@@ -14,5 +14,8 @@
 	},
 	"require-dev": {
 		"nette/tester": "^1.7"
+	},
+	"suggest": {
+		"spaze/csp-config": "Allows to add nonce attribute to script tags automatically, if enabled"
 	}
 }
