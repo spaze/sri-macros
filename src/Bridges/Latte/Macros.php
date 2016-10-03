@@ -7,9 +7,6 @@ class Macros
 	/** @var \Spaze\SubresourceIntegrity\Config */
 	private $sriConfig;
 
-	/** @var \Spaze\ContentSecurityPolicy\Config */
-	private $cspConfig;
-
 
 	/**
 	 * Constructor.
@@ -19,17 +16,6 @@ class Macros
 	public function __construct(\Spaze\SubresourceIntegrity\Config $sriConfig)
 	{
 		$this->sriConfig = $sriConfig;
-	}
-
-
-	/**
-	 * Set ContentSecurityPolicy service.
-	 *
-	 * @param \Spaze\ContentSecurityPolicy\Config $cspConfig
-	 */
-	public function setContentSecurityPolicy(\Spaze\ContentSecurityPolicy\Config $cspConfig)
-	{
-		$this->cspConfig = $cspConfig;
 	}
 
 
@@ -71,7 +57,7 @@ class Macros
 			"echo '<script"
 			. " src=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\""
-			. ($this->cspConfig !== null ? " nonce=\"' . %escape(\$cspConfig->getNonce()) . '\"'" : "'")
+			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\ContentSecurityPolicy\\NonceGeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('script', $node)
 			. " . '></script>';"
 		);
@@ -99,7 +85,7 @@ class Macros
 			"echo '<link rel=\"stylesheet\""
 			. " href=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\""
-			. ($this->cspConfig !== null ? " nonce=\"' . %escape(\$cspConfig->getNonce()) . '\"'" : "'")
+			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\ContentSecurityPolicy\\NonceGeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('stylesheet', $node)
 			. " . '>';"
 		);

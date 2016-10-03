@@ -35,10 +35,6 @@ class Extension extends \Nette\DI\CompilerExtension
 		$macros = $builder->addDefinition($this->prefix('macros'))
 			->setClass(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class);
 
-		if ($config['addNonce']) {
-			$macros->addSetup('setContentSecurityPolicy', ['@Spaze\ContentSecurityPolicy\Config']);
-		}
-
 		$macros = $builder->addDefinition($this->prefix('fileBuilder'))
 			->setClass(\Spaze\SubresourceIntegrity\FileBuilder::class);
 	}
