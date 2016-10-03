@@ -57,7 +57,7 @@ class Macros
 			"echo '<script"
 			. " src=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\""
-			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\ContentSecurityPolicy\\NonceGeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
+			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\NonceGenerator\\GeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('script', $node)
 			. " . '></script>';"
 		);
@@ -85,7 +85,7 @@ class Macros
 			"echo '<link rel=\"stylesheet\""
 			. " href=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\""
-			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\ContentSecurityPolicy\\NonceGeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
+			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\NonceGenerator\\GeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('stylesheet', $node)
 			. " . '>';"
 		);
