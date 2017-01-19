@@ -12,7 +12,7 @@ class FileBuilder
 	/**
 	 * Get build file mode data.
 	 * @param array $resources
-	 * @param string $pathPrefix
+	 * @param string $pathPrefix Should be an absolute path
 	 * @param string $buildPrefix
 	 * @return \stdClass
 	 */
@@ -20,7 +20,7 @@ class FileBuilder
 	{
 		$content = $extension = '';
 		foreach ($resources as $resource) {
-			$localFilename = sprintf('%s/%s/%s', rtrim(getcwd(), '/'), trim($pathPrefix, '/'), ltrim($resource, '/'));
+			$localFilename = sprintf('%s/%s', rtrim($pathPrefix, '/'), ltrim($resource, '/'));
 			$content .= file_get_contents($localFilename);
 			$extension = $extension ?: pathinfo($localFilename, PATHINFO_EXTENSION);
 		}
@@ -29,7 +29,7 @@ class FileBuilder
 			rtrim(strtr(base64_encode(hash('sha256', $content, true)), '+/', '-_'), '='),  // Encoded to base64url, see https://tools.ietf.org/html/rfc4648#section-5
 			$extension
 		);
-		$buildFilename = sprintf('%s/%s/%s', rtrim(getcwd(), '/'), trim($pathPrefix, '/'), $build);
+		$buildFilename = sprintf('%s/%s', rtrim($pathPrefix, '/'), $build);
 
 		if (!is_writable(dirname($buildFilename))) {
 			throw new Exceptions\DirectoryNotWritableException('Directory ' . dirname($buildFilename) . " doesn't exist or isn't writable");
