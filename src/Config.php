@@ -26,8 +26,12 @@ class Config
 	/** @var array of key => array of resources */
 	protected $resources = array();
 
-	/** @var array of (url => prefix, path => prefix) */
-	protected $localPrefix = array();
+	/** @var array of (url => prefix, path => prefix, build => prefix) */
+	protected $localPrefix = array(
+		'url' => '',
+		'path' => '',
+		'build' => '',
+	);
 
 	/** @var string */
 	protected $localMode = self::MODE_DIRECT;
@@ -62,7 +66,11 @@ class Config
 	 */
 	public function setLocalPrefix(array $prefix)
 	{
-		$this->localPrefix = $prefix;
+		foreach (array_keys($this->localPrefix) as $key) {
+			if (isset($prefix[$key])) {
+				$this->localPrefix[$key] = $prefix[$key];
+			}
+		}
 	}
 
 
