@@ -50,7 +50,7 @@ class Extension extends \Nette\DI\CompilerExtension
 			$service->addSetup('?->onCompile[] = function ($engine) { $this->getByType(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class)->install($engine->getCompiler()); }', ['@self']);
 		};
 
-		$latteFactoryService = $builder->getByType(\Nette\Bridges\ApplicationLatte\ILatteFactory::class) ?: 'nette.latteFactory';
+		$latteFactoryService = $builder->getByType('\Nette\Bridges\ApplicationLatte\ILatteFactory') ?: 'nette.latteFactory';
 		if ($builder->hasDefinition($latteFactoryService)) {
 			$register($builder->getDefinition($latteFactoryService));
 		}
