@@ -10,7 +10,8 @@
 		}
 	],
 	"require": {
-		"php": "~7.0"
+		"php": "~7.0",
+		"latte/latte": "^2.4"
 	},
 	"autoload": {
 		"psr-4": {"Spaze\\SubresourceIntegrity\\": "src"}
