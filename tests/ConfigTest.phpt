@@ -49,7 +49,7 @@ class ConfigTest extends Tester\TestCase
 	public function testGetHash()
 	{
 		$config = $this->getConfig();
-		$config->setHashingAlgos('sha256');
+		$config->setHashingAlgos(['sha256']);
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo' => '/foo.js']);
 		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
@@ -112,7 +112,7 @@ class ConfigTest extends Tester\TestCase
 	public function testUnknownLocalMode()
 	{
 		$config = $this->getConfig();
-		$config->setHashingAlgos('sha256');
+		$config->setHashingAlgos(['sha256']);
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo' => '/foo.js']);
 		$config->setLocalMode('direct');
@@ -127,7 +127,7 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalMode()
 	{
 		$config = $this->getConfig();
-		$config->setHashingAlgos('sha256');
+		$config->setHashingAlgos(['sha256']);
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
 		$config->setResources(['foo' => '/foo.js']);
 		$config->setLocalMode('build');
@@ -139,7 +139,7 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalModeNonExistingDir()
 	{
 		$config = $this->getConfig();
-		$config->setHashingAlgos('sha256');
+		$config->setHashingAlgos(['sha256']);
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests/does/not/exist']);
 		$config->setResources(['foo' => '/foo.js']);
 		$config->setLocalMode('build');
@@ -152,7 +152,7 @@ class ConfigTest extends Tester\TestCase
 	public function testDirectLocalModePlusSign()
 	{
 		$config = $this->getConfig();
-		$config->setHashingAlgos('sha256');
+		$config->setHashingAlgos(['sha256']);
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo+bar' => '/foo.js']);
 		$config->setLocalMode('direct');
@@ -163,7 +163,7 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalModePlusSign()
 	{
 		$config = $this->getConfig();
-		$config->setHashingAlgos('sha256');
+		$config->setHashingAlgos(['sha256']);
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
 		$config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
 		$config->setLocalMode('build');

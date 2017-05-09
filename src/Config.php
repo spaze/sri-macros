@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 namespace Spaze\SubresourceIntegrity;
 
 /**
@@ -56,9 +58,9 @@ class Config
 	/**
 	 * Set prefix for local resources.
 	 *
-	 * @param string $prefix
+	 * @param array $prefix
 	 */
-	public function setLocalPrefix($prefix)
+	public function setLocalPrefix(array $prefix)
 	{
 		$this->localPrefix = $prefix;
 	}
@@ -69,7 +71,7 @@ class Config
 	 *
 	 * @param string $mode
 	 */
-	public function setLocalMode($mode)
+	public function setLocalMode(string $mode)
 	{
 		$this->localMode = $mode;
 	}
@@ -78,11 +80,11 @@ class Config
 	/**
 	 * Set one or more hashing algorithms.
 	 *
-	 * @param string|array $algos
+	 * @param string[] $algos
 	 */
-	public function setHashingAlgos($algos)
+	public function setHashingAlgos(array $algos)
 	{
-		$this->hashingAlgos = (array)$algos;
+		$this->hashingAlgos = $algos;
 	}
 
 
@@ -92,7 +94,7 @@ class Config
 	 * @param string $resource
 	 * @return string
 	 */
-	public function getUrl($resource)
+	public function getUrl(string $resource): string
 	{
 		if (!$this->isCombo($resource) && is_array($this->resources[$resource])) {
 			$url = $this->resources[$resource]['url'];
@@ -110,9 +112,9 @@ class Config
 	 * Get SRI hash for a resource.
 	 *
 	 * @param string $resource
-	 * @return array
+	 * @return string
 	 */
-	public function getHash($resource)
+	public function getHash(string $resource): string
 	{
 		if (!$this->isCombo($resource) && is_array($this->resources[$resource])) {
 			if (is_array($this->resources[$resource]['hash'])) {
@@ -137,7 +139,7 @@ class Config
 	 * @param string $resource
 	 * @return \stdClass
 	 */
-	private function localFile($resource)
+	private function localFile(string $resource): \stdClass
 	{
 		if (empty($this->localResources[$this->localMode][$resource])) {
 			switch ($this->localMode) {
@@ -169,7 +171,7 @@ class Config
 	 * @param string $resource
 	 * @return boolean
 	 */
-	private function isCombo($resource)
+	private function isCombo(string $resource): bool
 	{
 		return (strpos($resource, self::BUILD_SEPARATOR) !== false);
 	}

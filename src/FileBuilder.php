@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 namespace Spaze\SubresourceIntegrity;
 
 /**
@@ -11,12 +13,12 @@ class FileBuilder
 
 	/**
 	 * Get build file mode data.
-	 * @param array $resources
+	 * @param string[] $resources
 	 * @param string $pathPrefix Should be an absolute path
 	 * @param string $buildPrefix
 	 * @return \stdClass
 	 */
-	public function build(array $resources, $pathPrefix, $buildPrefix)
+	public function build(array $resources, string $pathPrefix, string $buildPrefix): \stdClass
 	{
 		$content = $extension = '';
 		foreach ($resources as $resource) {

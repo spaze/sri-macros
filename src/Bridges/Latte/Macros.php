@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 namespace Spaze\SubresourceIntegrity\Bridges\Latte;
 
 class Macros
@@ -25,7 +27,7 @@ class Macros
 	 * @param \Latte\Compiler $compiler
 	 * @return \Latte\Macros\MacroSet
 	 */
-	public function install(\Latte\Compiler $compiler)
+	public function install(\Latte\Compiler $compiler): \Latte\Macros\MacroSet
 	{
 		$set = new \Latte\Macros\MacroSet($compiler);
 		$set->addMacro('script', array($this, 'macroScript'));
@@ -43,7 +45,7 @@ class Macros
 	 * @param \Latte\PhpWriter $writer
 	 * @return string
 	 */
-	public function macroScript(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
+	public function macroScript(\Latte\MacroNode $node, \Latte\PhpWriter $writer): string
 	{
 		if ($node->modifiers) {
 			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
@@ -71,7 +73,7 @@ class Macros
 	 * @param \Latte\PhpWriter $writer
 	 * @return string
 	 */
-	public function macroStylesheet(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
+	public function macroStylesheet(\Latte\MacroNode $node, \Latte\PhpWriter $writer): string
 	{
 		if ($node->modifiers) {
 			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
@@ -99,7 +101,7 @@ class Macros
 	 * @param \Latte\PhpWriter $writer
 	 * @return string
 	 */
-	public function macroResourceUrl(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
+	public function macroResourceUrl(\Latte\MacroNode $node, \Latte\PhpWriter $writer): string
 	{
 		if ($node->modifiers) {
 			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
@@ -119,7 +121,7 @@ class Macros
 	 * @param \Latte\PhpWriter $writer
 	 * @return string
 	 */
-	public function macroResourceHash(\Latte\MacroNode $node, \Latte\PhpWriter $writer)
+	public function macroResourceHash(\Latte\MacroNode $node, \Latte\PhpWriter $writer): string
 	{
 		if ($node->modifiers) {
 			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
@@ -139,7 +141,7 @@ class Macros
 	 * @param \Latte\MacroNode $node
 	 * @return string
 	 */
-	private function buildAttributes($macro, \Latte\MacroNode $node)
+	private function buildAttributes($macro, \Latte\MacroNode $node): string
 	{
 		$attributes = array("'crossorigin'" => "'anonymous'");
 		$isAttrName = true;
