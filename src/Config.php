@@ -29,7 +29,7 @@ class Config
 	/** @var array of (url => prefix, path => prefix) */
 	protected $localPrefix = array();
 
-	/** @var array of (url => prefix, path => prefix) */
+	/** @var string */
 	protected $localMode = self::MODE_DIRECT;
 
 	/** @var array of hashing algorithms */

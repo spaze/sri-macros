@@ -16,7 +16,8 @@
 		"psr-4": {"Spaze\\SubresourceIntegrity\\": "src"}
 	},
 	"require-dev": {
-		"nette/tester": "^1.7"
+		"nette/tester": "^1.7",
+		"phpstan/phpstan": "^0.6.4"
 	},
 	"suggest": {
 		"spaze/csp-config": "Sends Content Security Policy header with nonces, if enabled",
