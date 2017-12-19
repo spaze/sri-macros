@@ -17,7 +17,7 @@
 		"psr-4": {"Spaze\\SubresourceIntegrity\\": "src"}
 	},
 	"require-dev": {
-		"nette/tester": "^1.7",
+		"nette/tester": "^2.0",
 		"phpstan/phpstan": "^0.6.4"
 	},
 	"suggest": {
