@@ -44,7 +44,9 @@ class ConfigTest extends Tester\TestCase
 		]);
 
 		Assert::same('https://bar', $config->getUrl('foo'));
+		Assert::same('https://bar', $config->getUrl('foo', 'ext'));
 		Assert::same('/chuck/norris/waldo/quux.js', $config->getUrl('bar'));
+		Assert::same('/chuck/norris/waldo/quux.js', $config->getUrl('bar', 'ext'));
 	}
 
 
@@ -55,6 +57,7 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo' => '/foo.js']);
 		Assert::same(self::HASH_FOO, $config->getHash('foo'));
+		Assert::same(self::HASH_FOO, $config->getHash('foo', 'ext'));
 	}
 
 
@@ -77,6 +80,7 @@ class ConfigTest extends Tester\TestCase
 		$config = $this->getConfig();
 		$config->setResources(['foo' => ['url' => 'pluto://goofy']]);
 		Assert::same('pluto://goofy', $config->getUrl('foo'));
+		Assert::same('pluto://goofy', $config->getUrl('foo', 'ext'));
 	}
 
 
@@ -90,7 +94,9 @@ class ConfigTest extends Tester\TestCase
 			],
 		]);
 		Assert::same('pluto://goofy', $config->getUrl('foo'));
+		Assert::same('pluto://goofy', $config->getUrl('foo', 'ext'));
 		Assert::same('sha123-pluto', $config->getHash('foo'));
+		Assert::same('sha123-pluto', $config->getHash('foo', 'ext'));
 	}
 
 
@@ -135,6 +141,22 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalMode('build');
 		Assert::same(self::HASH_FOO, $config->getHash('foo'));
 		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.js'));
+		Assert::same(self::HASH_FOO, $config->getHash('foo', 'ignoredExt'));
+		Assert::false(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ignoredExt'));
+	}
+
+
+	public function testBuildLocalModeExtension()
+	{
+		$config = $this->getConfig();
+		$config->setHashingAlgos(['sha256']);
+		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$config->setResources(['foo' => '/foo.js']);
+		$config->setLocalMode('build');
+		Assert::same(self::HASH_FOO, $config->getHash('foo', 'ext'));
+		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ext'));
+		Assert::same(self::HASH_FOO, $config->getHash('foo', 'ignoredExt'));
+		Assert::false(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ignoredExt'));
 	}
 
 
@@ -169,8 +191,24 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
 		$config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
 		$config->setLocalMode('build');
-		Assert::same('sha256-kglG6YKgpQasqoSmJnaKB3iYhERsQji/YDJmuTQR6T8=', $config->getHash('foo+waldo'));
-		Assert::true(file_exists($this->tempDir . '/kglG6YKgpQasqoSmJnaKB3iYhERsQji_YDJmuTQR6T8.js'));
+		Assert::same('sha256-OKCqUCrz1KH7Or6Bh+kcYTB8fsSEsZxnHyaBFR1CVVw=', $config->getHash("foo+'baz'+waldo"));
+		Assert::true(file_exists($this->tempDir . '/OKCqUCrz1KH7Or6Bh-kcYTB8fsSEsZxnHyaBFR1CVVw.js'));
+	}
+
+
+	public function testBuildLocalModeStringResourceOnly()
+	{
+		$config = $this->getConfig();
+		$config->setHashingAlgos(['sha256']);
+		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$config->setLocalMode('build');
+		Assert::exception(function() use ($config) {
+			$config->getHash('"foobar"');
+		}, Exceptions\UnknownExtensionException::class);
+		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $config->getHash('"foobar"', 'js'));
+		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $config->getHash('"foo"+"bar"', 'ext'));
+		Assert::same('/../temp/tests/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.js', $config->getUrl('"foobar"', 'nowIgnored'));
+		Assert::same('/../temp/tests/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.ext', $config->getUrl('"foo"+"bar"', 'nowIgnored'));
 	}
 
 }

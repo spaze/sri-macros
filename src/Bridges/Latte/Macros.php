@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity\Bridges\Latte;
 
+use Spaze\SubresourceIntegrity\FileBuilder;
+
 class Macros
 {
 
@@ -52,8 +54,8 @@ class Macros
 		}
 
 		$resource = $node->tokenizer->fetchWord();
-		$url = $this->sriConfig->getUrl($resource);
-		$hash = $this->sriConfig->getHash($resource);
+		$url = $this->sriConfig->getUrl($resource, FileBuilder::EXT_JS);
+		$hash = $this->sriConfig->getHash($resource, FileBuilder::EXT_JS);
 
 		return $writer->write(
 			"echo '<script"
@@ -80,8 +82,8 @@ class Macros
 		}
 
 		$resource = $node->tokenizer->fetchWord();
-		$url = $this->sriConfig->getUrl($resource);
-		$hash = $this->sriConfig->getHash($resource);
+		$url = $this->sriConfig->getUrl($resource, FileBuilder::EXT_CSS);
+		$hash = $this->sriConfig->getHash($resource, FileBuilder::EXT_CSS);
 
 		return $writer->write(
 			"echo '<link rel=\"stylesheet\""
