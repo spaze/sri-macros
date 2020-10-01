@@ -16,13 +16,13 @@ class Config
 {
 
 	/** @internal direct access to local files */
-	const MODE_DIRECT = 'direct';
+	private const MODE_DIRECT = 'direct';
 
 	/** @internal build local files, new file for every new resource version */
-	const MODE_BUILD = 'build';
+	private const MODE_BUILD = 'build';
 
 	/** @internal separator between multiple resources */
-	const BUILD_SEPARATOR = '+';
+	private const BUILD_SEPARATOR = '+';
 
 	/** @var FileBuilder */
 	private $fileBuilder;
@@ -51,6 +51,7 @@ class Config
 	{
 		$this->fileBuilder = $fileBuilder;
 	}
+
 
 	/**
 	 * Set resources.
@@ -111,7 +112,8 @@ class Config
 		if (!$this->isCombo($resource) && isset($this->resources[$resource]) && is_array($this->resources[$resource])) {
 			$url = $this->resources[$resource]['url'];
 		} else {
-			$url = sprintf('%s/%s',
+			$url = sprintf(
+				'%s/%s',
 				rtrim($this->localPrefix['url'], '/'),
 				$this->localFile($resource, $extension)->url
 			);
