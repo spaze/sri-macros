@@ -34,11 +34,18 @@
 		"phpcs": "vendor/bin/phpcs src/ tests/",
 		"phpstan": "vendor/phpstan/phpstan/phpstan -vvv --ansi analyse --configuration phpstan.neon src/",
 		"tester": "vendor/nette/tester/src/tester -c tests/php-unix.ini --colors 1 --coverage coverage.html --coverage-src src/ tests/",
+		"tester-prod": "vendor/nette/tester/src/tester -p php -C --colors 1 tests/",
 		"test": [
 			"@lint",
 			"@phpcs",
 			"@phpstan",
 			"@tester"
+		],
+		"test-prod": [
+			"@lint",
+			"@phpcs",
+			"@phpstan",
+			"@tester-prod"
 		]
 	}
 }
