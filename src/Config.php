@@ -3,6 +3,10 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity;
 
+use Spaze\SubresourceIntegrity\Resource\FileResource;
+use Spaze\SubresourceIntegrity\Resource\ResourceInterface;
+use Spaze\SubresourceIntegrity\Resource\StringResource;
+
 /**
  * SubresourceIntegrity\Config service.
  *
@@ -102,14 +106,14 @@ class Config
 	 * @param string $resource
 	 * @return string
 	 */
-	public function getUrl(string $resource): string
+	public function getUrl(string $resource, ?string $extension = null): string
 	{
-		if (!$this->isCombo($resource) && is_array($this->resources[$resource])) {
+		if (!$this->isCombo($resource) && isset($this->resources[$resource]) && is_array($this->resources[$resource])) {
 			$url = $this->resources[$resource]['url'];
 		} else {
 			$url = sprintf('%s/%s',
 				rtrim($this->localPrefix['url'], '/'),
-				$this->localFile($resource)->url
+				$this->localFile($resource, $extension)->url
 			);
 		}
 		return $url;
@@ -122,9 +126,9 @@ class Config
 	 * @param string $resource
 	 * @return string
 	 */
-	public function getHash(string $resource): string
+	public function getHash(string $resource, ?string $extension = null): string
 	{
-		if (!$this->isCombo($resource) && is_array($this->resources[$resource])) {
+		if (!$this->isCombo($resource) && isset($this->resources[$resource]) && is_array($this->resources[$resource])) {
 			if (is_array($this->resources[$resource]['hash'])) {
 				$hash = implode(' ', $this->resources[$resource]['hash']);
 			} else {
@@ -133,7 +137,7 @@ class Config
 		} else {
 			$fileHashes = array();
 			foreach ($this->hashingAlgos as $algo) {
-				$fileHashes[] = $algo . '-' . base64_encode(hash_file($algo, $this->localFile($resource)->filename, true));
+				$fileHashes[] = $algo . '-' . base64_encode(hash_file($algo, $this->localFile($resource, $extension)->filename, true));
 			}
 			$hash = implode(' ', $fileHashes);
 		}
@@ -147,7 +151,7 @@ class Config
 	 * @param string $resource
 	 * @return \stdClass
 	 */
-	private function localFile(string $resource): \stdClass
+	private function localFile(string $resource, ?string $extension = null): \stdClass
 	{
 		if (empty($this->localResources[$this->localMode][$resource])) {
 			switch ($this->localMode) {
@@ -159,9 +163,9 @@ class Config
 				case self::MODE_BUILD:
 					$resources = [];
 					foreach (explode(self::BUILD_SEPARATOR, $resource) as $value) {
-						$resources[] = $this->resources[$value];
+						$resources[] = $this->getResource($value);
 					}
-					$data = $this->fileBuilder->build($resources, $this->localPrefix['path'], $this->localPrefix['build']);
+					$data = $this->fileBuilder->build($resources, $this->localPrefix['path'], $this->localPrefix['build'], $extension);
 					break;
 				default:
 					throw new Exceptions\UnknownModeException('Unknown local file mode: ' . $this->localMode);
@@ -181,6 +185,16 @@ class Config
 	private function isCombo(string $resource): bool
 	{
 		return (strpos($resource, self::BUILD_SEPARATOR) !== false);
+	}
+
+
+	private function getResource(string $resource): ResourceInterface
+	{
+		if (preg_match('/^[\'"](.*)[\'"]$/', $resource, $matches)) {
+			return new StringResource($matches[1]);
+		} else {
+			return new FileResource(sprintf('%s/%s', rtrim($this->localPrefix['path'], '/'), ltrim($this->resources[$resource], '/')));
+		}
 	}
 
 }
