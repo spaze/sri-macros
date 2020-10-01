@@ -165,7 +165,6 @@ class Config
 					break;
 				default:
 					throw new Exceptions\UnknownModeException('Unknown local file mode: ' . $this->localMode);
-					break;
 			}
 			$this->localResources[$this->localMode][$resource] = $data;
 		}

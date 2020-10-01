@@ -24,15 +24,15 @@ class Extension extends \Nette\DI\CompilerExtension
 
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->defaults);
+		$this->validateConfig($this->defaults);
 		$builder = $this->getContainerBuilder();
 
 		$sriConfig = $builder->addDefinition($this->prefix('config'))
 			->setClass(\Spaze\SubresourceIntegrity\Config::class)
-			->addSetup('setResources', array($config['resources']))
-			->addSetup('setLocalPrefix', array($config['localPrefix']))
-			->addSetup('setLocalMode', array($config['localMode']))
-			->addSetup('setHashingAlgos', array($config['hashingAlgos']));
+			->addSetup('setResources', [$this->config['resources']])
+			->addSetup('setLocalPrefix', [$this->config['localPrefix']])
+			->addSetup('setLocalMode', [$this->config['localMode']])
+			->addSetup('setHashingAlgos', [$this->config['hashingAlgos']]);
 
 		$macros = $builder->addDefinition($this->prefix('macros'))
 			->setClass(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class);
@@ -45,19 +45,9 @@ class Extension extends \Nette\DI\CompilerExtension
 	public function beforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
-
-		$register = function (\Nette\DI\Definitions\FactoryDefinition $service) {
-			$service->getResultDefinition()->addSetup('?->onCompile[] = function ($engine) { $this->getByType(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class)->install($engine->getCompiler()); }', ['@self']);
-		};
-
-		$latteFactoryService = $builder->getByType('\Nette\Bridges\ApplicationLatte\ILatteFactory') ?: 'nette.latteFactory';
-		if ($builder->hasDefinition($latteFactoryService)) {
-			$register($builder->getDefinition($latteFactoryService));
-		}
-
-		if ($builder->hasDefinition('nette.latte')) {
-			$register($builder->getDefinition('nette.latte'));
-		}
+		/** @var \Nette\DI\Definitions\FactoryDefinition $definition */
+		$definition = $builder->getDefinition($this->prefix('latteFactory'));
+		$definition->getResultDefinition()->addSetup('?->onCompile[] = function ($engine) { ?->install($engine->getCompiler()); }', ['@self']);
 	}
 
 }
