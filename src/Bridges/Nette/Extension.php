@@ -18,21 +18,22 @@ class Extension extends \Nette\DI\CompilerExtension
 			'url' => '',
 			'path' => '',
 		),
+		'localMode' => 'build',
 		'hashingAlgos' => 'sha256',
 	);
 
 
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->defaults);
+		$this->validateConfig($this->defaults);
 		$builder = $this->getContainerBuilder();
 
 		$sriConfig = $builder->addDefinition($this->prefix('config'))
 			->setClass(\Spaze\SubresourceIntegrity\Config::class)
-			->addSetup('setResources', array($config['resources']))
-			->addSetup('setLocalPrefix', array($config['localPrefix']))
-			->addSetup('setLocalMode', array($config['localMode']))
-			->addSetup('setHashingAlgos', array($config['hashingAlgos']));
+			->addSetup('setResources', [$this->config['resources']])
+			->addSetup('setLocalPrefix', [$this->config['localPrefix']])
+			->addSetup('setLocalMode', [$this->config['localMode']])
+			->addSetup('setHashingAlgos', [$this->config['hashingAlgos']]);
 
 		$macros = $builder->addDefinition($this->prefix('macros'))
 			->setClass(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class);
@@ -45,19 +46,10 @@ class Extension extends \Nette\DI\CompilerExtension
 	public function beforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
-
-		$register = function (\Nette\DI\Definitions\FactoryDefinition $service) {
-			$service->getResultDefinition()->addSetup('?->onCompile[] = function ($engine) { $this->getByType(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class)->install($engine->getCompiler()); }', ['@self']);
-		};
-
-		$latteFactoryService = $builder->getByType('\Nette\Bridges\ApplicationLatte\ILatteFactory') ?: 'nette.latteFactory';
-		if ($builder->hasDefinition($latteFactoryService)) {
-			$register($builder->getDefinition($latteFactoryService));
-		}
-
-		if ($builder->hasDefinition('nette.latte')) {
-			$register($builder->getDefinition('nette.latte'));
-		}
+		$latteFactoryService = $builder->getByType(\Nette\Bridges\ApplicationLatte\ILatteFactory::class) ?: 'nette.latteFactory';
+		/** @var \Nette\DI\Definitions\FactoryDefinition $service */
+		$service = $builder->getDefinition($latteFactoryService);
+		$service->getResultDefinition()->addSetup('?->onCompile[] = function (Latte\Engine $engine): void { $this->getByType(?)->install($engine->getCompiler()); }', ['@self', \Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class]);
 	}
 
 }

@@ -148,9 +148,11 @@ class Macros
 		$attrName = $attrValue = null;
 		while ($node->tokenizer->nextToken()) {
 			if ($node->tokenizer->isCurrent(\Latte\MacroTokens::T_SYMBOL)) {
-				${$isAttrName ? 'attrName' : 'attrValue'} = "'{$node->tokenizer->currentValue()}'";
+				$value = "'{$node->tokenizer->currentValue()}'";
+				$isAttrName ? $attrName = $value : $attrValue = $value;
 			} elseif ($node->tokenizer->isCurrent(\Latte\MacroTokens::T_STRING, \Latte\MacroTokens::T_VARIABLE)) {
-				${$isAttrName ? 'attrName' : 'attrValue'} = $node->tokenizer->currentValue();
+				$value = $node->tokenizer->currentValue();
+				$isAttrName ? $attrName = $value : $attrValue = $value;
 			} elseif ($node->tokenizer->isCurrent('=', '=>')) {
 				$isAttrName = false;
 			} elseif ($node->tokenizer->isCurrent(',')) {

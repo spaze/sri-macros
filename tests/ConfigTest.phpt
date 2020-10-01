@@ -13,7 +13,7 @@ use Spaze\SubresourceIntegrity\Exceptions;
 use Spaze\SubresourceIntegrity\FileBuilder;
 use Tester\Assert;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/bootstrap.php';
 
 class ConfigTest extends Tester\TestCase
 {
