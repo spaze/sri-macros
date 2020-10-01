@@ -19,6 +19,7 @@ class FileBuilder
 
 	/**
 	 * Get build file mode data.
+	 *
 	 * @param ResourceInterface[] $resources
 	 * @param string $pathPrefix Should be an absolute path
 	 * @param string $buildPrefix
@@ -35,7 +36,8 @@ class FileBuilder
 		if (!$extension) {
 			throw new Exceptions\UnknownExtensionException();
 		}
-		$build = sprintf('%s/%s.%s',
+		$build = sprintf(
+			'%s/%s.%s',
 			trim($buildPrefix, '/'),
 			rtrim(strtr(base64_encode(hash('sha256', $content, true)), '+/', '-_'), '='),  // Encoded to base64url, see https://tools.ietf.org/html/rfc4648#section-5
 			$extension

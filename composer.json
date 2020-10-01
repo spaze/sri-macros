@@ -12,7 +12,8 @@
 	"require": {
 		"php": "~7.1",
 		"latte/latte": "^2.8",
-		"nette/di": "^3.0"
+		"nette/di": "^3.0",
+		"spaze/coding-standard": "^0.0.3"
 	},
 	"autoload": {
 		"psr-4": {"Spaze\\SubresourceIntegrity\\": "src"}
@@ -29,10 +30,12 @@
 	},
 	"scripts": {
 		"lint": "vendor/bin/parallel-lint --colors src/ tests/",
+		"phpcs": "vendor/bin/phpcs src/ tests/",
 		"phpstan": "vendor/phpstan/phpstan/phpstan -vvv --ansi analyse --configuration phpstan.neon src/",
 		"tester": "vendor/nette/tester/src/tester -c tests/php-unix.ini --colors 1 --coverage coverage.html --coverage-src src/ tests/",
 		"test": [
 			"@lint",
+			"@phpcs",
 			"@phpstan",
 			"@tester"
 		]

@@ -8,6 +8,7 @@ interface ResourceInterface
 
 	public function getContent(): string;
 
+
 	public function getExtension(): ?string;
 
 }
