@@ -18,6 +18,8 @@ require __DIR__ . '/../vendor/autoload.php';
 class ConfigTest extends Tester\TestCase
 {
 
+	private const HASH_FOO = 'sha256-fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA=';
+
 	public $tempDir;
 
 
@@ -52,7 +54,7 @@ class ConfigTest extends Tester\TestCase
 		$config->setHashingAlgos(['sha256']);
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo' => '/foo.js']);
-		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+		Assert::same(self::HASH_FOO, $config->getHash('foo'));
 	}
 
 
@@ -63,8 +65,8 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalPrefix(['path' => 'foo/../']);
 		$config->setResources(['foo' => 'foo.js']);
 		$hashes = [
-			'sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=',
-			'sha512-Ya/YX2JNDJkMuwnP7Og+2HpkYVwwBaUXRk1pRbyp6kYhnlTNKnTlVGi/KLsGnZETuK+TBHhA4itCCy1/74UTvg=='
+			self::HASH_FOO,
+			'sha512-zAaAjLvuBRAzGql5dBMujcKWrreVviKdBkuueEsKh6XPQoHYLoyZJxt12yFI8IoCbBpg7Zyr24ysbSQkLaxAYw=='
 		];
 		Assert::same(implode(' ', $hashes), $config->getHash('foo'));
 	}
@@ -116,10 +118,10 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo' => '/foo.js']);
 		$config->setLocalMode('direct');
-		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+		Assert::same(self::HASH_FOO, $config->getHash('foo'));
 		$config->setLocalMode('foo');
 		Assert::exception(function() use ($config) {
-			Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+			Assert::same(self::HASH_FOO, $config->getHash('foo'));
 		}, Exceptions\UnknownModeException::class);
 	}
 
@@ -131,8 +133,8 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
 		$config->setResources(['foo' => '/foo.js']);
 		$config->setLocalMode('build');
-		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
-		Assert::true(file_exists($this->tempDir . '/VW3caaddC-Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY.js'));
+		Assert::same(self::HASH_FOO, $config->getHash('foo'));
+		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.js'));
 	}
 
 
@@ -144,7 +146,7 @@ class ConfigTest extends Tester\TestCase
 		$config->setResources(['foo' => '/foo.js']);
 		$config->setLocalMode('build');
 		Assert::exception(function() use ($config) {
-			Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo'));
+			Assert::same(self::HASH_FOO, $config->getHash('foo'));
 		}, Exceptions\DirectoryNotWritableException::class);
 	}
 
@@ -156,7 +158,7 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalPrefix(['path' => '.']);
 		$config->setResources(['foo+bar' => '/foo.js']);
 		$config->setLocalMode('direct');
-		Assert::same('sha256-VW3caaddC+Dsr8gs1GV2ZsgGPxPXYiggWcOf9dvxgRY=', $config->getHash('foo+bar'));
+		Assert::same(self::HASH_FOO, $config->getHash('foo+bar'));
 	}
 
 
@@ -167,8 +169,8 @@ class ConfigTest extends Tester\TestCase
 		$config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
 		$config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
 		$config->setLocalMode('build');
-		Assert::same('sha256-JVfM7rc8NwU7pFP1p7p4YJBW++QdyCbSnjq7AO4UIVg=', $config->getHash('foo+waldo'));
-		Assert::true(file_exists($this->tempDir . '/JVfM7rc8NwU7pFP1p7p4YJBW--QdyCbSnjq7AO4UIVg.js'));
+		Assert::same('sha256-kglG6YKgpQasqoSmJnaKB3iYhERsQji/YDJmuTQR6T8=', $config->getHash('foo+waldo'));
+		Assert::true(file_exists($this->tempDir . '/kglG6YKgpQasqoSmJnaKB3iYhERsQji_YDJmuTQR6T8.js'));
 	}
 
 }
