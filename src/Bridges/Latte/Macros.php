@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity\Bridges\Latte;
 
+use Spaze\SubresourceIntegrity\Exceptions;
 use Spaze\SubresourceIntegrity\FileBuilder;
 
 class Macros
@@ -54,6 +55,10 @@ class Macros
 		}
 
 		$resource = $node->tokenizer->fetchWord();
+		if (!$resource) {
+			throw new Exceptions\ShouldNotHappenException();
+		}
+
 		$url = $this->sriConfig->getUrl($resource, FileBuilder::EXT_JS);
 		$hash = $this->sriConfig->getHash($resource, FileBuilder::EXT_JS);
 
@@ -82,13 +87,14 @@ class Macros
 		}
 
 		$resource = $node->tokenizer->fetchWord();
-		$url = $this->sriConfig->getUrl($resource, FileBuilder::EXT_CSS);
-		$hash = $this->sriConfig->getHash($resource, FileBuilder::EXT_CSS);
+		if (!$resource) {
+			throw new Exceptions\ShouldNotHappenException();
+		}
 
 		return $writer->write(
 			"echo '<link rel=\"stylesheet\""
-			. " href=\"' . %escape('" . $url . "') . '\""
-			. " integrity=\"' . %escape('" . $hash . "') . '\""
+			. " href=\"' . %escape('" . $this->sriConfig->getUrl($resource, FileBuilder::EXT_CSS) . "') . '\""
+			. " integrity=\"' . %escape('" . $this->sriConfig->getHash($resource, FileBuilder::EXT_CSS) . "') . '\""
 			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\NonceGenerator\\GeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('stylesheet', $node)
 			. " . '>';"
@@ -110,9 +116,11 @@ class Macros
 		}
 
 		$resource = $node->tokenizer->fetchWord();
-		$url = $this->sriConfig->getUrl($resource);
+		if (!$resource) {
+			throw new Exceptions\ShouldNotHappenException();
+		}
 
-		return $writer->write("echo %escape('" . $url . "');");
+		return $writer->write("echo %escape('" . $this->sriConfig->getUrl($resource) . "');");
 	}
 
 
@@ -130,9 +138,11 @@ class Macros
 		}
 
 		$resource = $node->tokenizer->fetchWord();
-		$hash = $this->sriConfig->getHash($resource);
+		if (!$resource) {
+			throw new Exceptions\ShouldNotHappenException();
+		}
 
-		return $writer->write("echo %escape('" . $hash . "');");
+		return $writer->write("echo %escape('" . $this->sriConfig->getHash($resource) . "');");
 	}
 
 

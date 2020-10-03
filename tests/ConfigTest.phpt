@@ -25,15 +25,15 @@ class ConfigTest extends Tester\TestCase
 	private $config;
 
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->config = new Config(new FileBuilder());
 	}
 
 
-	public function testGetUrl()
+	public function testGetUrl(): void
 	{
-		$this->config->setLocalPrefix([
+		$this->config->setLocalPrefix((object)[
 			'url' => '/chuck/norris/',
 		]);
 		$this->config->setResources([
@@ -50,20 +50,20 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testGetHash()
+	public function testGetHash(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.']);
+		$this->config->setLocalPrefix((object)['path' => '.']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ext'));
 	}
 
 
-	public function testGetMultipleHashes()
+	public function testGetMultipleHashes(): void
 	{
 		$this->config->setHashingAlgos(['sha256', 'sha512']);
-		$this->config->setLocalPrefix(['path' => 'foo/../']);
+		$this->config->setLocalPrefix((object)['path' => 'foo/../']);
 		$this->config->setResources(['foo' => 'foo.js']);
 		$hashes = [
 			self::HASH_FOO,
@@ -73,7 +73,7 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testGetRemoteUrl()
+	public function testGetRemoteUrl(): void
 	{
 		$this->config->setResources(['foo' => ['url' => 'pluto://goofy']]);
 		Assert::same('pluto://goofy', $this->config->getUrl('foo'));
@@ -81,7 +81,17 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testGetRemoteHash()
+	/**
+	 * @throws \Spaze\SubresourceIntegrity\Exceptions\InvalidResourceAliasException Invalid character in resource alias, using + with remote files or in direct mode?
+	 */
+	public function testGetRemoteUrlInvalidCharacters(): void
+	{
+		$this->config->setResources(['foo+bar' => ['url' => 'pluto://goofy']]);
+		$this->config->getUrl('foo+bar');
+	}
+
+
+	public function testGetRemoteHash(): void
 	{
 		$this->config->setResources([
 			'foo' => [
@@ -96,7 +106,22 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testGetMultipleRemoteHashes()
+	/**
+	 * @throws \Spaze\SubresourceIntegrity\Exceptions\InvalidResourceAliasException Invalid character in resource alias, using + with remote files or in direct mode?
+	 */
+	public function testGetRemoteHashInvalidCharacters(): void
+	{
+		$this->config->setResources([
+			'foo+bar' => [
+				'url' => 'pluto://goofy',
+				'hash' => 'sha123-pluto'
+			],
+		]);
+		$this->config->getHash('foo+bar');
+	}
+
+
+	public function testGetMultipleRemoteHashes(): void
 	{
 		$this->config->setResources([
 			'foo' => [
@@ -112,10 +137,10 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testUnknownLocalMode()
+	public function testUnknownLocalMode(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.']);
+		$this->config->setLocalPrefix((object)['path' => '.']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('direct');
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
@@ -126,10 +151,10 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testBuildLocalMode()
+	public function testBuildLocalMode(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('build');
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
@@ -139,10 +164,10 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testBuildLocalModeExtension()
+	public function testBuildLocalModeExtension(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('build');
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ext'));
@@ -152,10 +177,10 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testBuildLocalModeNonExistingDir()
+	public function testBuildLocalModeNonExistingDir(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests/does/not/exist']);
+		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests/does/not/exist']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('build');
 		Assert::exception(function() {
@@ -164,20 +189,21 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testDirectLocalModePlusSign()
+	/**
+	 * @throws \Spaze\SubresourceIntegrity\Exceptions\InvalidResourceAliasException Invalid character in resource alias, using + with remote files or in direct mode?
+	 */
+	public function testDirectLocalModePlusSign(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.']);
-		$this->config->setResources(['foo+bar' => '/foo.js']);
 		$this->config->setLocalMode('direct');
-		Assert::same(self::HASH_FOO, $this->config->getHash('foo+bar'));
+		$this->config->getHash('foo+bar');
 	}
 
 
-	public function testBuildLocalModePlusSign()
+	public function testBuildLocalModePlusSign(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
 		$this->config->setLocalMode('build');
 		Assert::same('sha256-OKCqUCrz1KH7Or6Bh+kcYTB8fsSEsZxnHyaBFR1CVVw=', $this->config->getHash("foo+'baz'+waldo"));
@@ -185,10 +211,10 @@ class ConfigTest extends Tester\TestCase
 	}
 
 
-	public function testBuildLocalModeStringResourceOnly()
+	public function testBuildLocalModeStringResourceOnly(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix(['path' => '.', 'build' => '../temp/tests']);
+		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setLocalMode('build');
 		Assert::exception(function() {
 			$this->config->getHash('"foobar"');

@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity\Resource;
 
+use Spaze\SubresourceIntegrity\Exceptions;
+
 class FileResource implements ResourceInterface
 {
 
@@ -18,7 +20,11 @@ class FileResource implements ResourceInterface
 
 	public function getContent(): string
 	{
-		return file_get_contents($this->filename);
+		$content = file_get_contents($this->filename);
+		if (!$content) {
+			throw new Exceptions\CannotGetFileContentException();
+		}
+		return $content;
 	}
 
 
