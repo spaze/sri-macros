@@ -1,2 +1,5 @@
 parameters:
-	level: 5
+	level: max
+
+includes:
+	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
