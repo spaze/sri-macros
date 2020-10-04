@@ -68,7 +68,7 @@ class Config
 	/**
 	 * Set prefix for local resources.
 	 *
-	 * @param array{url: string, path: string, build: string} $prefix
+	 * @param array<string, string> $prefix
 	 */
 	public function setLocalPrefix(array $prefix): void
 	{
