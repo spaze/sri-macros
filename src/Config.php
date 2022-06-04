@@ -16,10 +16,10 @@ class Config
 	private const BUILD_SEPARATOR = '+';
 
 	/** @var array<string, string|array{url: string, hash: string|array<int, string>}> */
-	protected array $resources = [];
+	private array $resources = [];
 
 	/** @var array{url: string, path: string, build: string} */
-	protected array $localPrefix = [
+	private array $localPrefix = [
 		'url' => '',
 		'path' => '',
 		'build' => '',
@@ -28,10 +28,10 @@ class Config
 	private LocalMode $localMode = LocalMode::Direct;
 
 	/** @var array<int, string> */
-	protected array $hashingAlgos = [];
+	private array $hashingAlgos = [];
 
 	/** @var array<string, array<string, stdClass>> */
-	protected array $localResources = [];
+	private array $localResources = [];
 
 
 	public function __construct(
