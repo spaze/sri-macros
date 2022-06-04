@@ -4,14 +4,11 @@ declare(strict_types = 1);
 namespace Spaze\SubresourceIntegrity;
 
 use Spaze\SubresourceIntegrity\Exceptions;
+use Spaze\SubresourceIntegrity\Exceptions\ShouldNotHappenException;
 use Spaze\SubresourceIntegrity\Resource\FileResource;
 use Spaze\SubresourceIntegrity\Resource\StringResource;
+use stdClass;
 
-/**
- * SubresourceIntegrity\Config service.
- *
- * @author Michal Špaček
- */
 class Config
 {
 
@@ -24,39 +21,33 @@ class Config
 	/** @internal separator between multiple resources */
 	private const BUILD_SEPARATOR = '+';
 
-	/** @var FileBuilder */
-	private $fileBuilder;
-
 	/** @var array<string, string|array{url: string, hash: string|array<int, string>}> */
-	protected $resources = [];
+	protected array $resources = [];
 
 	/** @var array{url: string, path: string, build: string} */
-	protected $localPrefix = array(
+	protected array $localPrefix = [
 		'url' => '',
 		'path' => '',
 		'build' => '',
-	);
+	];
 
-	/** @var string */
-	protected $localMode = self::MODE_DIRECT;
+	protected string $localMode = self::MODE_DIRECT;
 
 	/** @var array<int, string> */
-	protected $hashingAlgos = [];
+	protected array $hashingAlgos = [];
 
-	/** @var array<string, array<string, \stdClass>> */
-	protected $localResources = [];
+	/** @var array<string, array<string, stdClass>> */
+	protected array $localResources = [];
 
 
-	public function __construct(FileBuilder $fileBuilder)
-	{
-		$this->fileBuilder = $fileBuilder;
+	public function __construct(
+		private FileBuilder $fileBuilder,
+	) {
 	}
 
 
 	/**
-	 * Set resources.
-	 *
-	 * @param array<string, string|array{url: string, hash: (string|array<int, string>)}> $resources
+	 * @param array<string, string|array{url: string, hash: string|array<int, string>}> $resources
 	 */
 	public function setResources(array $resources): void
 	{
@@ -64,12 +55,7 @@ class Config
 	}
 
 
-	/**
-	 * Set prefix for local resources.
-	 *
-	 * @param \stdClass $prefix
-	 */
-	public function setLocalPrefix(\stdClass $prefix): void
+	public function setLocalPrefix(stdClass $prefix): void
 	{
 		foreach (array_keys($this->localPrefix) as $key) {
 			if (isset($prefix->$key)) {
@@ -102,16 +88,13 @@ class Config
 
 
 	/**
-	 * Get full URL for a resource.
-	 *
-	 * @param string $resource
-	 * @return string
+	 * @throws ShouldNotHappenException
 	 */
 	public function getUrl(string $resource, ?string $extension = null): string
 	{
 		if ($this->isRemote($resource)) {
 			if (!is_array($this->resources[$resource])) {
-				throw new Exceptions\ShouldNotHappenException();
+				throw new ShouldNotHappenException();
 			}
 			$url = $this->resources[$resource]['url'];
 		} else {
@@ -126,10 +109,7 @@ class Config
 
 
 	/**
-	 * Get SRI hash for a resource.
-	 *
-	 * @param string $resource
-	 * @return string
+	 * @throws ShouldNotHappenException
 	 */
 	public function getHash(string $resource, ?string $extension = null): string
 	{
@@ -143,7 +123,7 @@ class Config
 				$hash = $this->resources[$resource]['hash'];
 			}
 		} else {
-			$fileHashes = array();
+			$fileHashes = [];
 			foreach ($this->hashingAlgos as $algo) {
 				if (!in_array($algo, ['sha256', 'sha384', 'sha512'])) {
 					throw new Exceptions\UnsupportedHashAlgorithmException();
@@ -172,12 +152,9 @@ class Config
 
 
 	/**
-	 * Get local file data.
-	 *
-	 * @param string $resource
-	 * @return \stdClass
+	 * @throws ShouldNotHappenException
 	 */
-	private function localFile(string $resource, ?string $extension = null): \stdClass
+	private function localFile(string $resource, ?string $extension = null): stdClass
 	{
 		if (empty($this->localResources[$this->localMode][$resource])) {
 			switch ($this->localMode) {
@@ -185,7 +162,7 @@ class Config
 					if ($this->isCombo($resource)) {
 						throw new Exceptions\InvalidResourceAliasException();
 					}
-					$data = new \stdClass();
+					$data = new stdClass();
 					$data->url = $this->getFilePath($resource);
 					$cwd = getcwd();
 					if (!$cwd) {
@@ -225,6 +202,9 @@ class Config
 	}
 
 
+	/**
+	 * @throws ShouldNotHappenException
+	 */
 	private function getFilePath(string $resource): string
 	{
 		if (is_array($this->resources[$resource])) {

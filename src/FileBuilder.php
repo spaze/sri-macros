@@ -4,12 +4,8 @@ declare(strict_types = 1);
 namespace Spaze\SubresourceIntegrity;
 
 use Spaze\SubresourceIntegrity\Resource\ResourceInterface;
+use stdClass;
 
-/**
- * SubresourceIntegrity\FileBuilder service.
- *
- * @author Michal Špaček
- */
 class FileBuilder
 {
 
@@ -24,9 +20,9 @@ class FileBuilder
 	 * @param string $pathPrefix Should be an absolute path
 	 * @param string $buildPrefix
 	 * @param string|null $extension
-	 * @return \stdClass
+	 * @return stdClass
 	 */
-	public function build(array $resources, string $pathPrefix, string $buildPrefix, ?string $extension = null): \stdClass
+	public function build(array $resources, string $pathPrefix, string $buildPrefix, ?string $extension = null): stdClass
 	{
 		$content = '';
 		foreach ($resources as $resource) {
@@ -50,7 +46,7 @@ class FileBuilder
 
 		file_put_contents($buildFilename, $content);
 
-		$data = new \stdClass();
+		$data = new stdClass();
 		$data->url = $build;
 		$data->filename = $buildFilename;
 		return $data;
