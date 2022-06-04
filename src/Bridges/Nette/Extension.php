@@ -3,22 +3,24 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity\Bridges\Nette;
 
+use Nette\Bridges\ApplicationLatte\ILatteFactory;
+use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\FactoryDefinition;
 use Nette\Schema\Expect;
+use Nette\Schema\Schema;
+use Spaze\SubresourceIntegrity\Bridges\Latte\Macros;
 use Spaze\SubresourceIntegrity\Config;
+use Spaze\SubresourceIntegrity\FileBuilder;
+use stdClass;
 
-/**
- * SubresourceIntegrity\Config extension.
- *
- * @author Michal Špaček
- */
-class Extension extends \Nette\DI\CompilerExtension
+class Extension extends CompilerExtension
 {
 
-	/** @var \stdClass */
+	/** @var stdClass */
 	protected $config;
 
 
-	public function getConfigSchema(): \Nette\Schema\Schema
+	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
 			'resources' => Expect::anyOf(
@@ -54,20 +56,20 @@ class Extension extends \Nette\DI\CompilerExtension
 			->addSetup('setHashingAlgos', [$this->config->hashingAlgos]);
 
 		$macros = $builder->addDefinition($this->prefix('macros'))
-			->setClass(\Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class);
+			->setClass(Macros::class);
 
 		$macros = $builder->addDefinition($this->prefix('fileBuilder'))
-			->setClass(\Spaze\SubresourceIntegrity\FileBuilder::class);
+			->setClass(FileBuilder::class);
 	}
 
 
 	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
-		$latteFactoryService = $builder->getByType(\Nette\Bridges\ApplicationLatte\ILatteFactory::class) ?: 'nette.latteFactory';
-		/** @var \Nette\DI\Definitions\FactoryDefinition $service */
+		$latteFactoryService = $builder->getByType(ILatteFactory::class) ?: 'nette.latteFactory';
+		/** @var FactoryDefinition $service */
 		$service = $builder->getDefinition($latteFactoryService);
-		$service->getResultDefinition()->addSetup('?->onCompile[] = function (Latte\Engine $engine): void { $this->getByType(?)->install($engine->getCompiler()); }', ['@self', \Spaze\SubresourceIntegrity\Bridges\Latte\Macros::class]);
+		$service->getResultDefinition()->addSetup('?->onCompile[] = function (Latte\Engine $engine): void { $this->getByType(?)->install($engine->getCompiler()); }', ['@self', Macros::class]);
 	}
 
 }
