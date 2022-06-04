@@ -12,12 +12,6 @@ use stdClass;
 class Config
 {
 
-	/** @internal direct access to local files */
-	public const MODE_DIRECT = 'direct';
-
-	/** @internal build local files, new file for every new resource version */
-	public const MODE_BUILD = 'build';
-
 	/** @internal separator between multiple resources */
 	private const BUILD_SEPARATOR = '+';
 
@@ -31,7 +25,7 @@ class Config
 		'build' => '',
 	];
 
-	protected string $localMode = self::MODE_DIRECT;
+	private LocalMode $localMode = LocalMode::Direct;
 
 	/** @var array<int, string> */
 	protected array $hashingAlgos = [];
@@ -65,12 +59,7 @@ class Config
 	}
 
 
-	/**
-	 * Set local mode.
-	 *
-	 * @param string $mode
-	 */
-	public function setLocalMode(string $mode): void
+	public function setLocalMode(LocalMode $mode): void
 	{
 		$this->localMode = $mode;
 	}
@@ -156,9 +145,9 @@ class Config
 	 */
 	private function localFile(string $resource, ?string $extension = null): stdClass
 	{
-		if (empty($this->localResources[$this->localMode][$resource])) {
+		if (empty($this->localResources[$this->localMode->value][$resource])) {
 			switch ($this->localMode) {
-				case self::MODE_DIRECT:
+				case LocalMode::Direct:
 					if ($this->isCombo($resource)) {
 						throw new Exceptions\InvalidResourceAliasException();
 					}
@@ -170,7 +159,7 @@ class Config
 					}
 					$data->filename = sprintf('%s/%s/%s', rtrim($cwd, '/'), trim($this->localPrefix['path'], '/'), $data->url);
 					break;
-				case self::MODE_BUILD:
+				case LocalMode::Build:
 					$resources = [];
 					foreach (explode(self::BUILD_SEPARATOR, $resource) as $value) {
 						if (preg_match('/^[\'"](.*)[\'"]$/', $value, $matches)) {
@@ -182,11 +171,11 @@ class Config
 					$data = $this->fileBuilder->build($resources, $this->localPrefix['path'], $this->localPrefix['build'], $extension);
 					break;
 				default:
-					throw new Exceptions\UnknownModeException('Unknown local file mode: ' . $this->localMode);
+					throw new Exceptions\UnknownModeException('Unknown local file mode: ' . $this->localMode->value);
 			}
-			$this->localResources[$this->localMode][$resource] = $data;
+			$this->localResources[$this->localMode->value][$resource] = $data;
 		}
-		return $this->localResources[$this->localMode][$resource];
+		return $this->localResources[$this->localMode->value][$resource];
 	}
 
 

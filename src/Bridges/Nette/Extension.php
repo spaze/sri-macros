@@ -11,6 +11,7 @@ use Nette\Schema\Schema;
 use Spaze\SubresourceIntegrity\Bridges\Latte\Macros;
 use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\FileBuilder;
+use Spaze\SubresourceIntegrity\LocalMode;
 use stdClass;
 
 class Extension extends CompilerExtension
@@ -38,7 +39,7 @@ class Extension extends CompilerExtension
 				'path' => Expect::string(),
 				'build' => Expect::string(),
 			])->required(),
-			'localMode' => Expect::anyOf(Config::MODE_DIRECT, Config::MODE_BUILD)->default(Config::MODE_DIRECT),
+			'localMode' => Expect::anyOf(...LocalMode::allModes())->default(LocalMode::Direct->value),
 			'hashingAlgos' => Expect::listOf(Expect::string()),
 		]);
 	}

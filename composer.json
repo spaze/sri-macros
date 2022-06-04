@@ -10,7 +10,7 @@
 		}
 	],
 	"require": {
-		"php": "^8.0",
+		"php": "^8.1",
 		"latte/latte": "^2.8",
 		"nette/di": "^3.0",
 		"spaze/coding-standard": "^0.0"
