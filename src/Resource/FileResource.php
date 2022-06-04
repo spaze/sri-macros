@@ -21,7 +21,7 @@ class FileResource implements ResourceInterface
 	{
 		$content = file_get_contents($this->filename);
 		if (!$content) {
-			throw new CannotGetFileContentException();
+			throw new CannotGetFileContentException($this->filename);
 		}
 		return $content;
 	}
