@@ -1,21 +1,20 @@
 <?php
+/** @noinspection SpellCheckingInspection Many Base64 strings in here */
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+declare(strict_types = 1);
 
-/**
- * Test: Spaze\SubresourceIntegrity\Config.
- *
- * @testCase Spaze\SubresourceIntegrity\ConfigTest
- * @author Michal Špaček
- * @package Spaze\SubresourceIntegrity\Config
- */
+namespace Spaze\SubresourceIntegrity;
 
-use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\Exceptions;
-use Spaze\SubresourceIntegrity\FileBuilder;
 use Tester\Assert;
+use Tester\Environment;
+use Tester\Helpers;
+use Tester\TestCase;
 
 require __DIR__ . '/bootstrap.php';
 
-class ConfigTest extends Tester\TestCase
+/** @testCase */
+class ConfigTest extends TestCase
 {
 
 	private const HASH_FOO = 'sha256-fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA=';

@@ -27,9 +27,9 @@ class Extension extends \Nette\DI\CompilerExtension
 					'url' => Expect::string(),
 					'hash' => Expect::anyOf(
 						Expect::string(),
-						Expect::listOf(Expect::string())
-					)
-				])
+						Expect::listOf(Expect::string()),
+					),
+				]),
 			)->required(),
 			'localPrefix' => Expect::structure([
 				'url' => Expect::string(),

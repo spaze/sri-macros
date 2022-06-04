@@ -62,14 +62,13 @@ class Macros
 		$url = $this->sriConfig->getUrl($resource, FileBuilder::EXT_JS);
 		$hash = $this->sriConfig->getHash($resource, FileBuilder::EXT_JS);
 
-		return $writer->write(
-			"echo '<script"
+		$code = "echo '<script"
 			. " src=\"' . %escape('" . $url . "') . '\""
 			. " integrity=\"' . %escape('" . $hash . "') . '\""
 			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\NonceGenerator\\GeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('script', $node)
-			. " . '></script>';"
-		);
+			. " . '></script>';";
+		return $writer->write($code);
 	}
 
 
@@ -91,14 +90,13 @@ class Macros
 			throw new Exceptions\ShouldNotHappenException();
 		}
 
-		return $writer->write(
-			"echo '<link rel=\"stylesheet\""
+		$code = "echo '<link rel=\"stylesheet\""
 			. " href=\"' . %escape('" . $this->sriConfig->getUrl($resource, FileBuilder::EXT_CSS) . "') . '\""
 			. " integrity=\"' . %escape('" . $this->sriConfig->getHash($resource, FileBuilder::EXT_CSS) . "') . '\""
 			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\NonceGenerator\\GeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('stylesheet', $node)
-			. " . '>';"
-		);
+			. " . '>';";
+		return $writer->write($code);
 	}
 
 
