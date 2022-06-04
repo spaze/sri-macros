@@ -59,9 +59,9 @@ class Config
 	}
 
 
-	public function setLocalMode(LocalMode $mode): void
+	public function setLocalMode(LocalMode|string $localMode): void
 	{
-		$this->localMode = $mode;
+		$this->localMode = is_string($localMode) ? LocalMode::from($localMode) : $localMode;
 	}
 
 

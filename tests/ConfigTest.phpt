@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpDocMissingThrowsInspection */
 /** @noinspection SpellCheckingInspection Many Base64 strings in here */
@@ -215,6 +216,26 @@ class ConfigTest extends TestCase
 		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash('"foo"+"bar"', 'ext'));
 		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.js", $this->config->getUrl('"foobar"', 'nowIgnored'));
 		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.ext", $this->config->getUrl('"foo"+"bar"', 'nowIgnored'));
+	}
+
+
+	public function testSetLocalMode(): void
+	{
+		Assert::noError(function (): void {
+			$this->config->setLocalMode(LocalMode::Build);
+			$this->config->setLocalMode(LocalMode::Direct);
+			$this->config->setLocalMode('build');
+			$this->config->setLocalMode('direct');
+		});
+	}
+
+
+	/**
+	 * @throws \ValueError "foo" is not a valid backing value for enum "Spaze\SubresourceIntegrity\LocalMode"
+	 */
+	public function testSetLocalModeInvalid(): void
+	{
+		$this->config->setLocalMode('foo');
 	}
 
 }
