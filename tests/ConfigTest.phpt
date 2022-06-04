@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocMissingThrowsInspection */
 /** @noinspection SpellCheckingInspection Many Base64 strings in here */
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
 declare(strict_types = 1);
@@ -21,8 +23,7 @@ class ConfigTest extends TestCase
 
 	private string $tempDir;
 	private string $buildDir;
-
-	private $config;
+	private Config $config;
 
 
 	public function __construct()
@@ -146,24 +147,11 @@ class ConfigTest extends TestCase
 	}
 
 
-	public function testUnknownLocalMode(): void
-	{
-		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setResources(['foo' => '/foo.js']);
-		$this->config->setLocalMode('direct');
-		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
-		$this->config->setLocalMode('foo');
-		Assert::exception(function() {
-			Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
-		}, Exceptions\UnknownModeException::class);
-	}
-
-
 	public function testBuildLocalMode(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setResources(['foo' => '/foo.js']);
-		$this->config->setLocalMode('build');
+		$this->config->setLocalMode(LocalMode::Build);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
 		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.js'));
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ignoredExt'));
@@ -175,7 +163,7 @@ class ConfigTest extends TestCase
 	{
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setResources(['foo' => '/foo.js']);
-		$this->config->setLocalMode('build');
+		$this->config->setLocalMode(LocalMode::Build);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ext'));
 		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ext'));
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ignoredExt'));
@@ -188,7 +176,7 @@ class ConfigTest extends TestCase
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setLocalPrefix((object)['build' => "{$this->buildDir}/does/not/exist"]);
 		$this->config->setResources(['foo' => '/foo.js']);
-		$this->config->setLocalMode('build');
+		$this->config->setLocalMode(LocalMode::Build);
 		Assert::exception(function() {
 			Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
 		}, Exceptions\DirectoryNotWritableException::class);
@@ -201,7 +189,7 @@ class ConfigTest extends TestCase
 	public function testDirectLocalModePlusSign(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalMode('direct');
+		$this->config->setLocalMode(LocalMode::Direct);
 		$this->config->getHash('foo+bar');
 	}
 
@@ -210,7 +198,7 @@ class ConfigTest extends TestCase
 	{
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
-		$this->config->setLocalMode('build');
+		$this->config->setLocalMode(LocalMode::Build);
 		Assert::same('sha256-OKCqUCrz1KH7Or6Bh+kcYTB8fsSEsZxnHyaBFR1CVVw=', $this->config->getHash("foo+'baz'+waldo"));
 		Assert::true(file_exists($this->tempDir . '/OKCqUCrz1KH7Or6Bh-kcYTB8fsSEsZxnHyaBFR1CVVw.js'));
 	}
@@ -219,7 +207,7 @@ class ConfigTest extends TestCase
 	public function testBuildLocalModeStringResourceOnly(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalMode('build');
+		$this->config->setLocalMode(LocalMode::Build);
 		Assert::exception(function() {
 			$this->config->getHash('"foobar"');
 		}, Exceptions\UnknownExtensionException::class);
