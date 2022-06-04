@@ -1,33 +1,43 @@
 <?php
+/** @noinspection SpellCheckingInspection Many Base64 strings in here */
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+declare(strict_types = 1);
 
-/**
- * Test: Spaze\SubresourceIntegrity\Config.
- *
- * @testCase Spaze\SubresourceIntegrity\ConfigTest
- * @author Michal Špaček
- * @package Spaze\SubresourceIntegrity\Config
- */
+namespace Spaze\SubresourceIntegrity;
 
-use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\Exceptions;
-use Spaze\SubresourceIntegrity\FileBuilder;
 use Tester\Assert;
+use Tester\Environment;
+use Tester\Helpers;
+use Tester\TestCase;
 
 require __DIR__ . '/bootstrap.php';
 
-class ConfigTest extends Tester\TestCase
+/** @testCase */
+class ConfigTest extends TestCase
 {
 
 	private const HASH_FOO = 'sha256-fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA=';
 
-	public $tempDir;
+	private string $tempDir;
+	private string $buildDir;
 
 	private $config;
+
+
+	public function __construct()
+	{
+		$this->buildDir = '../temp/tests/' . getenv(Environment::THREAD);
+		$this->tempDir = __DIR__ . '/' . $this->buildDir;
+		@mkdir(dirname($this->tempDir));  // intentionally @ - the dir might exist already
+		Helpers::purge($this->tempDir);
+	}
 
 
 	public function setUp(): void
 	{
 		$this->config = new Config(new FileBuilder());
+		$this->config->setLocalPrefix((object)['path' => '.', 'build' => $this->buildDir]);
 	}
 
 
@@ -53,7 +63,6 @@ class ConfigTest extends Tester\TestCase
 	public function testGetHash(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['path' => '.']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ext'));
@@ -140,7 +149,6 @@ class ConfigTest extends Tester\TestCase
 	public function testUnknownLocalMode(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['path' => '.']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('direct');
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
@@ -154,7 +162,6 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalMode(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('build');
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
@@ -167,7 +174,6 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalModeExtension(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('build');
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ext'));
@@ -180,7 +186,7 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalModeNonExistingDir(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests/does/not/exist']);
+		$this->config->setLocalPrefix((object)['build' => "{$this->buildDir}/does/not/exist"]);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode('build');
 		Assert::exception(function() {
@@ -203,7 +209,6 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalModePlusSign(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
 		$this->config->setLocalMode('build');
 		Assert::same('sha256-OKCqUCrz1KH7Or6Bh+kcYTB8fsSEsZxnHyaBFR1CVVw=', $this->config->getHash("foo+'baz'+waldo"));
@@ -214,20 +219,16 @@ class ConfigTest extends Tester\TestCase
 	public function testBuildLocalModeStringResourceOnly(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['path' => '.', 'build' => '../temp/tests']);
 		$this->config->setLocalMode('build');
 		Assert::exception(function() {
 			$this->config->getHash('"foobar"');
 		}, Exceptions\UnknownExtensionException::class);
 		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash('"foobar"', 'js'));
 		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash('"foo"+"bar"', 'ext'));
-		Assert::same('/../temp/tests/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.js', $this->config->getUrl('"foobar"', 'nowIgnored'));
-		Assert::same('/../temp/tests/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.ext', $this->config->getUrl('"foo"+"bar"', 'nowIgnored'));
+		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.js", $this->config->getUrl('"foobar"', 'nowIgnored'));
+		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.ext", $this->config->getUrl('"foo"+"bar"', 'nowIgnored'));
 	}
 
 }
 
-$testCase = new ConfigTest();
-$testCase->tempDir = __DIR__ . '/../temp/tests';
-Tester\Helpers::purge($testCase->tempDir);
-$testCase->run();
+(new ConfigTest())->run();

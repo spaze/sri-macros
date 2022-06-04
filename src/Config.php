@@ -5,7 +5,6 @@ namespace Spaze\SubresourceIntegrity;
 
 use Spaze\SubresourceIntegrity\Exceptions;
 use Spaze\SubresourceIntegrity\Resource\FileResource;
-use Spaze\SubresourceIntegrity\Resource\ResourceInterface;
 use Spaze\SubresourceIntegrity\Resource\StringResource;
 
 /**
@@ -28,7 +27,7 @@ class Config
 	/** @var FileBuilder */
 	private $fileBuilder;
 
-	/** @var array<string, string|array{url: string, hash: string|array<integer, string>}> */
+	/** @var array<string, string|array{url: string, hash: string|array<int, string>}> */
 	protected $resources = [];
 
 	/** @var array{url: string, path: string, build: string} */
@@ -41,7 +40,7 @@ class Config
 	/** @var string */
 	protected $localMode = self::MODE_DIRECT;
 
-	/** @var array<integer, string> */
+	/** @var array<int, string> */
 	protected $hashingAlgos = [];
 
 	/** @var array<string, array<string, \stdClass>> */
@@ -57,7 +56,7 @@ class Config
 	/**
 	 * Set resources.
 	 *
-	 * @param array<string, string|array{url: string, hash: string|array<integer, string>}> $resources
+	 * @param array<string, string|array{url: string, hash: (string|array<int, string>)}> $resources
 	 */
 	public function setResources(array $resources): void
 	{
@@ -119,7 +118,7 @@ class Config
 			$url = sprintf(
 				'%s/%s',
 				rtrim($this->localPrefix['url'], '/'),
-				$this->localFile($resource, $extension)->url
+				$this->localFile($resource, $extension)->url,
 			);
 		}
 		return $url;
@@ -218,7 +217,7 @@ class Config
 	 * Whether the resource is a combination one (e.g. foo+bar).
 	 *
 	 * @param string $resource
-	 * @return boolean
+	 * @return bool
 	 */
 	private function isCombo(string $resource): bool
 	{

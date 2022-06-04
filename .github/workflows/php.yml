@@ -10,11 +10,8 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 7.1
-          - 7.2
-          - 7.3
-          - 7.4
-          - 8.0
+          - "8.0"
+          - "8.1"
 
     steps:
     - uses: actions/checkout@v2
@@ -40,7 +37,7 @@ jobs:
       run: composer update --no-progress --no-interaction
 
     - name: Run tests
-      run: composer test-prod
+      run: composer test
 
     - name: Failed test output, if any
       if: failure()
