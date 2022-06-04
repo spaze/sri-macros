@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity\Bridges\Nette;
 
-use Nette\Bridges\ApplicationLatte\ILatteFactory;
+use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\Schema\Expect;
@@ -48,25 +48,25 @@ class Extension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 
-		$sriConfig = $builder->addDefinition($this->prefix('config'))
-			->setClass(Config::class)
+		$builder->addDefinition($this->prefix('config'))
+			->setType(Config::class)
 			->addSetup('setResources', [$this->config->resources])
 			->addSetup('setLocalPrefix', [$this->config->localPrefix])
 			->addSetup('setLocalMode', [$this->config->localMode])
 			->addSetup('setHashingAlgos', [$this->config->hashingAlgos]);
 
-		$macros = $builder->addDefinition($this->prefix('macros'))
-			->setClass(Macros::class);
+		$builder->addDefinition($this->prefix('macros'))
+			->setType(Macros::class);
 
-		$macros = $builder->addDefinition($this->prefix('fileBuilder'))
-			->setClass(FileBuilder::class);
+		$builder->addDefinition($this->prefix('fileBuilder'))
+			->setType(FileBuilder::class);
 	}
 
 
 	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
-		$latteFactoryService = $builder->getByType(ILatteFactory::class) ?: 'nette.latteFactory';
+		$latteFactoryService = $builder->getByType(LatteFactory::class) ?: 'nette.latteFactory';
 		/** @var FactoryDefinition $service */
 		$service = $builder->getDefinition($latteFactoryService);
 		$service->getResultDefinition()->addSetup('?->onCompile[] = function (Latte\Engine $engine): void { $this->getByType(?)->install($engine->getCompiler()); }', ['@self', Macros::class]);
