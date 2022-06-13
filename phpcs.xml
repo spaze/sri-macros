@@ -6,12 +6,4 @@
 	<arg value="s"/>
 	<arg value="p"/>
 	<rule ref="vendor/spaze/coding-standard/src/ruleset.xml"/>
-	<rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
-		<!-- Sniffer doesn't support enums yet https://github.com/squizlabs/PHP_CodeSniffer/pull/3482 -->
-		<exclude-pattern>src/LocalMode</exclude-pattern>
-	</rule>
-	<rule ref="Generic.WhiteSpace.ScopeIndent">
-		<!-- Sniffer doesn't support enums yet https://github.com/squizlabs/PHP_CodeSniffer/pull/3482 -->
-		<exclude-pattern>src/LocalMode</exclude-pattern>
-	</rule>
 </ruleset>
