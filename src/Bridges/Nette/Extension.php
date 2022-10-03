@@ -3,14 +3,12 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity\Bridges\Nette;
 
-use Latte\Engine;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Spaze\SubresourceIntegrity\Bridges\Latte\LatteExtension;
-use Spaze\SubresourceIntegrity\Bridges\Latte\Macros;
 use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\FileBuilder;
 use Spaze\SubresourceIntegrity\LocalMode;
@@ -50,17 +48,12 @@ class Extension extends CompilerExtension
 	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
-
 		$builder->addDefinition($this->prefix('config'))
 			->setType(Config::class)
 			->addSetup('setResources', [$this->config->resources])
 			->addSetup('setLocalPrefix', [$this->config->localPrefix])
 			->addSetup('setLocalMode', [$this->config->localMode])
 			->addSetup('setHashingAlgos', [$this->config->hashingAlgos]);
-
-		$builder->addDefinition($this->prefix('macros'))
-			->setType(Macros::class);
-
 		$builder->addDefinition($this->prefix('fileBuilder'))
 			->setType(FileBuilder::class);
 	}
@@ -72,12 +65,8 @@ class Extension extends CompilerExtension
 		$latteFactoryService = $builder->getByType(LatteFactory::class) ?: 'nette.latteFactory';
 		/** @var FactoryDefinition $service */
 		$service = $builder->getDefinition($latteFactoryService);
-		if (version_compare(Engine::VERSION, '3', '<')) {
-			$service->getResultDefinition()->addSetup('?->onCompile[] = function (Latte\Engine $engine): void { $this->getByType(?)->install($engine->getCompiler()); }', ['@self', Macros::class]);
-		} else {
-			$extension = $builder->addDefinition($this->prefix('latte.extension'))->setFactory(LatteExtension::class);
-			$service->getResultDefinition()->addSetup('addExtension', [$extension]);
-		}
+		$extension = $builder->addDefinition($this->prefix('latte.extension'))->setFactory(LatteExtension::class);
+		$service->getResultDefinition()->addSetup('addExtension', [$extension]);
 	}
 
 }

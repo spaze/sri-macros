@@ -169,7 +169,6 @@ class Config
 				case LocalMode::Build:
 					$resources = [];
 					foreach ((array)$resource as $value) {
-						$value = trim($value, '\'"');  // For Latte 2 compatibility, Latte 3 will pass strings unquoted
 						if (!isset($this->resources[$value])) {
 							$resources[] = new StringResource($value);
 						} else {
