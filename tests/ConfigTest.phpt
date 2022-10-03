@@ -8,7 +8,8 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity;
 
-use Spaze\SubresourceIntegrity\Exceptions;
+use Spaze\SubresourceIntegrity\Exceptions\DirectoryNotWritableException;
+use Spaze\SubresourceIntegrity\Exceptions\UnknownExtensionException;
 use Tester\Assert;
 use Tester\Environment;
 use Tester\Helpers;
@@ -56,9 +57,9 @@ class ConfigTest extends TestCase
 		]);
 
 		Assert::same('https://bar', $this->config->getUrl('foo'));
-		Assert::same('https://bar', $this->config->getUrl('foo', 'ext'));
+		Assert::same('https://bar', $this->config->getUrl('foo', HtmlElement::Link));
 		Assert::same('/chuck/norris/waldo/quux.js', $this->config->getUrl('bar'));
-		Assert::same('/chuck/norris/waldo/quux.js', $this->config->getUrl('bar', 'ext'));
+		Assert::same('/chuck/norris/waldo/quux.js', $this->config->getUrl('bar', HtmlElement::Script));
 	}
 
 
@@ -67,7 +68,7 @@ class ConfigTest extends TestCase
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
-		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ext'));
+		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Link));
 	}
 
 
@@ -88,7 +89,7 @@ class ConfigTest extends TestCase
 	{
 		$this->config->setResources(['foo' => ['url' => 'pluto://goofy']]);
 		Assert::same('pluto://goofy', $this->config->getUrl('foo'));
-		Assert::same('pluto://goofy', $this->config->getUrl('foo', 'ext'));
+		Assert::same('pluto://goofy', $this->config->getUrl('foo', HtmlElement::Link));
 	}
 
 
@@ -111,9 +112,9 @@ class ConfigTest extends TestCase
 			],
 		]);
 		Assert::same('pluto://goofy', $this->config->getUrl('foo'));
-		Assert::same('pluto://goofy', $this->config->getUrl('foo', 'ext'));
+		Assert::same('pluto://goofy', $this->config->getUrl('foo', HtmlElement::Link));
 		Assert::same('sha123-pluto', $this->config->getHash('foo'));
-		Assert::same('sha123-pluto', $this->config->getHash('foo', 'ext'));
+		Assert::same('sha123-pluto', $this->config->getHash('foo', HtmlElement::Link));
 	}
 
 
@@ -155,7 +156,7 @@ class ConfigTest extends TestCase
 		$this->config->setLocalMode(LocalMode::Build);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
 		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.js'));
-		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ignoredExt'));
+		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Link));
 		Assert::false(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ignoredExt'));
 	}
 
@@ -165,9 +166,9 @@ class ConfigTest extends TestCase
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setResources(['foo' => '/foo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
-		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ext'));
-		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ext'));
-		Assert::same(self::HASH_FOO, $this->config->getHash('foo', 'ignoredExt'));
+		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Link));
+		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.css'));
+		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Script));
 		Assert::false(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ignoredExt'));
 	}
 
@@ -180,7 +181,7 @@ class ConfigTest extends TestCase
 		$this->config->setLocalMode(LocalMode::Build);
 		Assert::exception(function() {
 			Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
-		}, Exceptions\DirectoryNotWritableException::class);
+		}, DirectoryNotWritableException::class);
 	}
 
 
@@ -200,7 +201,7 @@ class ConfigTest extends TestCase
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
-		Assert::same('sha256-OKCqUCrz1KH7Or6Bh+kcYTB8fsSEsZxnHyaBFR1CVVw=', $this->config->getHash("foo+'baz'+waldo"));
+		Assert::same('sha256-OKCqUCrz1KH7Or6Bh+kcYTB8fsSEsZxnHyaBFR1CVVw=', $this->config->getHash(['foo', 'baz', 'waldo']));
 		Assert::true(file_exists($this->tempDir . '/OKCqUCrz1KH7Or6Bh-kcYTB8fsSEsZxnHyaBFR1CVVw.js'));
 	}
 
@@ -210,12 +211,12 @@ class ConfigTest extends TestCase
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setLocalMode(LocalMode::Build);
 		Assert::exception(function() {
-			$this->config->getHash('"foobar"');
-		}, Exceptions\UnknownExtensionException::class);
-		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash('"foobar"', 'js'));
-		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash('"foo"+"bar"', 'ext'));
-		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.js", $this->config->getUrl('"foobar"', 'nowIgnored'));
-		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.ext", $this->config->getUrl('"foo"+"bar"', 'nowIgnored'));
+			$this->config->getHash('foobar');
+		}, UnknownExtensionException::class);
+		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash('foobar', HtmlElement::Script));
+		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash(['foo', 'bar'], HtmlElement::Link));
+		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.js", $this->config->getUrl('foobar', HtmlElement::Script));
+		Assert::same("/{$this->buildDir}/w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI.css", $this->config->getUrl(['foo', 'bar'], HtmlElement::Link));
 	}
 
 
