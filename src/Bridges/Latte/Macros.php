@@ -11,7 +11,7 @@ use Latte\MacroTokens;
 use Latte\PhpWriter;
 use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\Exceptions\ShouldNotHappenException;
-use Spaze\SubresourceIntegrity\FileBuilder;
+use Spaze\SubresourceIntegrity\HtmlElement;
 
 class Macros
 {
@@ -50,8 +50,8 @@ class Macros
 			throw new ShouldNotHappenException();
 		}
 
-		$url = $this->sriConfig->getUrl($resource, FileBuilder::EXT_JS);
-		$hash = $this->sriConfig->getHash($resource, FileBuilder::EXT_JS);
+		$url = $this->sriConfig->getUrl($resource, HtmlElement::Script);
+		$hash = $this->sriConfig->getHash($resource, HtmlElement::Script);
 
 		$code = "echo '<script"
 			. " src=\"' . %escape('" . $url . "') . '\""
@@ -81,8 +81,8 @@ class Macros
 		}
 
 		$code = "echo '<link rel=\"stylesheet\""
-			. " href=\"' . %escape('" . $this->sriConfig->getUrl($resource, FileBuilder::EXT_CSS) . "') . '\""
-			. " integrity=\"' . %escape('" . $this->sriConfig->getHash($resource, FileBuilder::EXT_CSS) . "') . '\""
+			. " href=\"' . %escape('" . $this->sriConfig->getUrl($resource, HtmlElement::Link) . "') . '\""
+			. " integrity=\"' . %escape('" . $this->sriConfig->getHash($resource, HtmlElement::Link) . "') . '\""
 			. "' . (isset(\$this->global->nonceGenerator) && \$this->global->nonceGenerator instanceof \\Spaze\\NonceGenerator\\GeneratorInterface ? ' nonce=\"' . %escape(\$this->global->nonceGenerator->getNonce()) . '\"' : '')"
 			. $this->buildAttributes('stylesheet', $node)
 			. " . '>';";
