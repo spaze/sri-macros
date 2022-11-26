@@ -14,6 +14,7 @@ use Tester\Assert;
 use Tester\Environment;
 use Tester\Helpers;
 use Tester\TestCase;
+use ValueError;
 
 require __DIR__ . '/bootstrap.php';
 
@@ -231,12 +232,15 @@ class ConfigTest extends TestCase
 	}
 
 
-	/**
-	 * @throws \ValueError "foo" is not a valid backing value for enum "Spaze\SubresourceIntegrity\LocalMode"
-	 */
 	public function testSetLocalModeInvalid(): void
 	{
-		$this->config->setLocalMode('foo');
+		Assert::throws(
+			function (): void {
+				$this->config->setLocalMode('foo');
+			},
+			ValueError::class,
+			PHP_VERSION_ID < 80200 ? '"foo" is not a valid backing value for enum "Spaze\SubresourceIntegrity\LocalMode"' : '"foo" is not a valid backing value for enum Spaze\SubresourceIntegrity\LocalMode',
+		);
 	}
 
 }
