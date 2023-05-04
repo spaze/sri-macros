@@ -5,9 +5,8 @@ namespace Spaze\SubresourceIntegrity\Bridges\Latte\Nodes;
 
 use Generator;
 use Latte\CompileException;
-use Latte\Compiler\Nodes\Php\Expression\ArrayItemNode;
+use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\Php\Expression\BinaryOpNode;
-use Latte\Compiler\Nodes\Php\ExpressionNode;
 use Latte\Compiler\Nodes\Php\Scalar\StringNode;
 use Latte\Compiler\Nodes\StatementNode;
 use Latte\Compiler\Position;
@@ -54,9 +53,8 @@ abstract class SriNode extends StatementNode
 
 		/** @var array<string, string|null> $attributes */
 		$attributes = [];
-		/** @var ArrayItemNode $attributeNode */
 		foreach ($attributeNodes->items as $attributeNode) {
-			if (!$attributeNode->value instanceof StringNode) {
+			if (!$attributeNode || !$attributeNode->value instanceof StringNode) {
 				throw new ShouldNotHappenException();
 			}
 			if ($attributeNode->key) {
@@ -84,7 +82,7 @@ abstract class SriNode extends StatementNode
 	 * @throws UnsupportedNodeException
 	 * @throws UnsupportedOperatorException
 	 */
-	private static function getResources(ExpressionNode $node): array
+	private static function getResources(Node $node): array
 	{
 		$resources = [];
 		if ($node instanceof StringNode) {
@@ -93,7 +91,6 @@ abstract class SriNode extends StatementNode
 			if ($node->operator !== Config::BUILD_SEPARATOR) {
 				throw new UnsupportedOperatorException($node->operator, Config::BUILD_SEPARATOR);
 			}
-			/** @var ExpressionNode $item */
 			foreach ($node as $item) {
 				$resources = array_merge($resources, self::getResources($item));
 			}
