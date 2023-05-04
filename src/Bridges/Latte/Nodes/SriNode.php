@@ -109,8 +109,8 @@ abstract class SriNode extends StatementNode
 		$mask = <<<'XX'
 			echo '<' . %escape(%dump) %line;
 			$ʟ__sriTagAttrs = %dump;
-			if (isset($this->global->nonceGenerator) && $this->global->nonceGenerator instanceof \Spaze\NonceGenerator\GeneratorInterface) {
-				$ʟ__sriTagAttrs['nonce'] = $this->global->nonceGenerator->getNonce();
+			if (isset($this->global->uiNonce)) {
+				$ʟ__sriTagAttrs['nonce'] = (string)$this->global->uiNonce;
 			}
 			foreach ($ʟ__sriTagAttrs as $ʟ__sriTagAttrKey => $ʟ__sriTagAttrValue) {
 				echo $ʟ__sriTagAttrValue ? ' ' . %escape($ʟ__sriTagAttrKey) . '="' . %escape($ʟ__sriTagAttrValue) . '"' : ' ' . %escape($ʟ__sriTagAttrKey);
