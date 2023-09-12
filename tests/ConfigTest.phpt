@@ -8,6 +8,7 @@ declare(strict_types = 1);
 
 namespace Spaze\SubresourceIntegrity;
 
+use Spaze\SubresourceIntegrity\Exceptions\CannotGetFilePathForRemoteResourceException;
 use Spaze\SubresourceIntegrity\Exceptions\DirectoryNotWritableException;
 use Spaze\SubresourceIntegrity\Exceptions\UnknownExtensionException;
 use Tester\Assert;
@@ -61,6 +62,26 @@ class ConfigTest extends TestCase
 		Assert::same('https://bar', $this->config->getUrl('foo', HtmlElement::Link));
 		Assert::same('/chuck/norris/waldo/quux.js', $this->config->getUrl('bar'));
 		Assert::same('/chuck/norris/waldo/quux.js', $this->config->getUrl('bar', HtmlElement::Script));
+	}
+
+
+	public function testGetFileResource(): void
+	{
+		$this->config->setLocalPrefix((object)[
+			'path' => '/chuck/norris/',
+		]);
+		$this->config->setResources([
+			'foo' => [
+				'url' => 'https://nope'
+			],
+			'bar' => '/waldo/quux.js',
+		]);
+		Assert::exception(function (): void {
+			$this->config->getFileResource('foo');
+		}, CannotGetFilePathForRemoteResourceException::class, 'Cannot get file path for remote resource foo');
+		$fileResource = $this->config->getFileResource('bar');
+		Assert::same('/chuck/norris/waldo/quux.js', $fileResource->getFilename());
+		Assert::same('js', $fileResource->getExtension());
 	}
 
 
