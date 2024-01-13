@@ -264,6 +264,21 @@ class ConfigTest extends TestCase
 		);
 	}
 
+
+	public function testGetSetLocalPrefixes(): void
+	{
+		Assert::same("./$this->buildDir", $this->config->getLocalPathBuildPrefix());
+
+		$this->config->setLocalBuildPrefix('foobar');
+		Assert::same('./foobar', $this->config->getLocalPathBuildPrefix());
+
+		$this->config->setLocalPrefix((object)['path' => '/what/ever/', 'build' => '/lala/land/']);
+		Assert::same('/what/ever/lala/land', $this->config->getLocalPathBuildPrefix());
+
+		$this->config->setLocalPrefix((object)['path' => 'what/ever', 'build' => 'lala/land']);
+		Assert::same('what/ever/lala/land', $this->config->getLocalPathBuildPrefix());
+	}
+
 }
 
 (new ConfigTest())->run();
