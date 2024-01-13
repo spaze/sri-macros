@@ -62,6 +62,12 @@ class Config
 	}
 
 
+	public function setLocalBuildPrefix(string $prefix): void
+	{
+		$this->localPrefix['build'] = $prefix;
+	}
+
+
 	public function setLocalMode(LocalMode|string $localMode): void
 	{
 		$this->localMode = is_string($localMode) ? LocalMode::from($localMode) : $localMode;
