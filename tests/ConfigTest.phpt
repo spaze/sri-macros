@@ -32,7 +32,7 @@ class ConfigTest extends TestCase
 
 	public function __construct()
 	{
-		$this->buildDir = '../temp/tests/' . getenv(Environment::THREAD);
+		$this->buildDir = '../temp/tests/' . getenv(Environment::VariableThread);
 		$this->tempDir = __DIR__ . '/' . $this->buildDir;
 		@mkdir(dirname($this->tempDir));  // intentionally @ - the dir might exist already
 		Helpers::purge($this->tempDir);
