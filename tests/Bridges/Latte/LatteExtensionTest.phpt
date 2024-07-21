@@ -71,9 +71,9 @@ class LatteExtensionTest extends TestCase
 			Assert::matchFile($localPrefixDir . $scripts[5]['src'], 'BAR');
 			Assert::matchFile($localPrefixDir . $scripts[6]['src'], 'BAR');
 		} else {
-			Assert::matchFile($localPrefixDir . $scripts[4]['src'], "quux\nbaz");
-			Assert::matchFile($localPrefixDir . $scripts[5]['src'], "quux\nbaz");
-			Assert::matchFile($localPrefixDir . $scripts[6]['src'], "quux\nbaz");
+			Assert::matchFile($localPrefixDir . $scripts[4]['src'], "WALDO\nbaz");
+			Assert::matchFile($localPrefixDir . $scripts[5]['src'], "WALDO\nbaz");
+			Assert::matchFile($localPrefixDir . $scripts[6]['src'], "WALDO\nbaz");
 		}
 		Assert::matchFile($localPrefixDir . $scripts[7]['src'], 'FRED');
 
