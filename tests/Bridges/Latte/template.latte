@@ -1,0 +1,22 @@
+{script foo}
+{script bar}
+{script foo + bar}
+{script foo + 'waldo + fred+baz ' + bar}
+
+Parsed as a string 'bar+baz' in Latte 3.0.17 and newer, as 'bar' + 'baz' otherwise
+{script bar+baz}
+{script 'bar+baz'}
+{script bar + baz}
+
+Parsed as 'bar + baz' no matter the Latte version
+{script 'bar + baz'}
+
+{stylesheet foo}
+{styleSheet bar}
+
+<i class="url">{resourceUrl foo}</i>
+<i class="url">{resourceUrl bar}</i>
+<i class="url">{resourceUrl foo + bar}</i>
+<i class="hash">{resourceHash foo}</i>
+<i class="hash">{resourceHash bar}</i>
+<i class="hash">{resourceHash foo + bar}</i>
