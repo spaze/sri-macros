@@ -23,7 +23,7 @@ require __DIR__ . '/bootstrap.php';
 class ConfigTest extends TestCase
 {
 
-	private const HASH_FOO = 'sha256-fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA=';
+	private const HASH_FOO = 'sha256-Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw=';
 
 	private string $tempDir;
 	private string $buildDir;
@@ -87,7 +87,7 @@ class ConfigTest extends TestCase
 	public function testGetHash(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setResources(['foo' => '/foo.js']);
+		$this->config->setResources(['foo' => '/assets/foo.js']);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Link));
 	}
@@ -96,11 +96,11 @@ class ConfigTest extends TestCase
 	public function testGetMultipleHashes(): void
 	{
 		$this->config->setHashingAlgos(['sha256', 'sha512']);
-		$this->config->setLocalPrefix((object)['path' => 'foo/../']);
+		$this->config->setLocalPrefix((object)['path' => 'foo/../assets']);
 		$this->config->setResources(['foo' => 'foo.js']);
 		$hashes = [
 			self::HASH_FOO,
-			'sha512-zAaAjLvuBRAzGql5dBMujcKWrreVviKdBkuueEsKh6XPQoHYLoyZJxt12yFI8IoCbBpg7Zyr24ysbSQkLaxAYw=='
+			'sha512-Mz6AdmkKsEt6DFZ+hhfQVKEoZZISIT97SmgJEwKAupO+tWVfhgGnb59VxH3W49/Gf/WfQIiZXHsAHMafjAtqyg=='
 		];
 		Assert::same(implode(' ', $hashes), $this->config->getHash('foo'));
 	}
@@ -173,24 +173,24 @@ class ConfigTest extends TestCase
 	public function testBuildLocalMode(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setResources(['foo' => '/foo.js']);
+		$this->config->setResources(['foo' => '/assets/foo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
-		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.js'));
+		Assert::true(file_exists($this->tempDir . '/Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw.js'));
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Link));
-		Assert::false(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ignoredExt'));
+		Assert::false(file_exists($this->tempDir . '/Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw.ignoredExt'));
 	}
 
 
 	public function testBuildLocalModeExtension(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setResources(['foo' => '/foo.js']);
+		$this->config->setResources(['foo' => '/assets/foo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Link));
-		Assert::true(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.css'));
+		Assert::true(file_exists($this->tempDir . '/Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw.css'));
 		Assert::same(self::HASH_FOO, $this->config->getHash('foo', HtmlElement::Script));
-		Assert::false(file_exists($this->tempDir . '/fYZelZskZpGMmGOvypQtD7idfJrAyZuvw3SVBN7ZdzA.ignoredExt'));
+		Assert::false(file_exists($this->tempDir . '/Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw.ignoredExt'));
 	}
 
 
@@ -198,7 +198,7 @@ class ConfigTest extends TestCase
 	{
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setLocalPrefix((object)['build' => "{$this->buildDir}/does/not/exist"]);
-		$this->config->setResources(['foo' => '/foo.js']);
+		$this->config->setResources(['foo' => '/assets/foo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
 		Assert::exception(function() {
 			Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
@@ -220,10 +220,10 @@ class ConfigTest extends TestCase
 	public function testBuildLocalModePlusSign(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setResources(['foo' => '/foo.js', 'waldo' => '/waldo.js']);
+		$this->config->setResources(['foo' => '/assets/foo.js', 'waldo' => '/assets/waldo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
-		Assert::same('sha256-OKCqUCrz1KH7Or6Bh+kcYTB8fsSEsZxnHyaBFR1CVVw=', $this->config->getHash(['foo', 'baz', 'waldo']));
-		Assert::true(file_exists($this->tempDir . '/OKCqUCrz1KH7Or6Bh-kcYTB8fsSEsZxnHyaBFR1CVVw.js'));
+		Assert::same('sha256-+vECTQha7Zz09xOwEIPocbCG8b+A2g5cjgSEAwSTzWY=', $this->config->getHash(['foo', 'baz', 'waldo']));
+		Assert::true(file_exists($this->tempDir . '/-vECTQha7Zz09xOwEIPocbCG8b-A2g5cjgSEAwSTzWY.js'));
 	}
 
 
