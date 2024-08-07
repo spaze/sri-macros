@@ -220,10 +220,10 @@ class ConfigTest extends TestCase
 	public function testBuildLocalModePlusSign(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setResources(['foo' => '/assets/foo.js', 'waldo' => '/assets/waldo.js']);
+		$this->config->setResources(['foo' => '/assets/foo.js', 'bar+baz' => '/assets/barPlusBaz.js']);
 		$this->config->setLocalMode(LocalMode::Build);
-		Assert::same('sha256-+vECTQha7Zz09xOwEIPocbCG8b+A2g5cjgSEAwSTzWY=', $this->config->getHash(['foo', 'baz', 'waldo']));
-		Assert::true(file_exists($this->tempDir . '/-vECTQha7Zz09xOwEIPocbCG8b-A2g5cjgSEAwSTzWY.js'));
+		Assert::same('sha256-xRrPznZA5BzHOh1F2C6Uxy6fqFkD0Vo0Y8ubg1TgpSY=', $this->config->getHash(['foo', 'baz', 'bar+baz']));
+		Assert::true(file_exists($this->tempDir . '/xRrPznZA5BzHOh1F2C6Uxy6fqFkD0Vo0Y8ubg1TgpSY.js'));
 	}
 
 
