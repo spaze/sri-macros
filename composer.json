@@ -23,7 +23,7 @@
 		"phpstan/phpstan": "^1.10.33",
 		"php-parallel-lint/php-parallel-lint": "^1.3.2",
 		"php-parallel-lint/php-console-highlighter": "^1.0",
-		"spaze/coding-standard": "^1.7"
+		"spaze/coding-standard": "^1.7.2"
 	},
 	"suggest": {
 		"spaze/csp-config": "Sends Content Security Policy header with nonces, if enabled",
