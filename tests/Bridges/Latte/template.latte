@@ -1,18 +1,21 @@
-{script foo empty-attribute, attribute => value}
-{script bar empty-attribute, attribute => value}
-{script foo + bar empty-attribute, attribute => value}
-{script foo + 'waldo + fred+baz ' + bar empty-attribute, attribute => value}
-{script bar+baz empty-attribute, attribute => value}
-{script 'bar+baz' empty-attribute, attribute => value}
-{script bar + baz empty-attribute, attribute => value}
-{script 'bar + baz' empty-attribute, attribute => value}
+0. {script foo empty-attribute, attribute => value}
+1. {script bar empty-attribute, attribute => value}
+2. {script foo + bar empty-attribute, attribute => value}
+3. {script foo+bar empty-attribute, attribute => value}
+4. {script 'foo + bar' empty-attribute, attribute => value}
+5. {script 'foo+bar' empty-attribute, attribute => value}
+6. {script foo + 'waldo + fred+baz ' + bar empty-attribute, attribute => value}
+7. {script bar+baz empty-attribute, attribute => value}
+8. {script 'bar+baz' empty-attribute, attribute => value}
+9. {script bar + baz empty-attribute, attribute => value}
+10. {script 'bar + baz' empty-attribute, attribute => value}
 
-{stylesheet foo empty-attribute, attribute => value}
-{styleSheet bar empty-attribute, attribute => value}
+0. {stylesheet foo empty-attribute, attribute => value}
+1. {styleSheet bar empty-attribute, attribute => value}
 
-<i class="url">{resourceUrl foo}</i>
-<i class="url">{resourceUrl bar}</i>
-<i class="url">{resourceUrl foo + bar}</i>
-<i class="hash">{resourceHash foo}</i>
-<i class="hash">{resourceHash bar}</i>
-<i class="hash">{resourceHash foo + bar}</i>
+0. <i class="url">{resourceUrl foo}</i>
+1. <i class="url">{resourceUrl bar}</i>
+2. <i class="url">{resourceUrl foo + bar}</i>
+0. <i class="hash">{resourceHash foo}</i>
+1. <i class="hash">{resourceHash bar}</i>
+2. <i class="hash">{resourceHash foo + bar}</i>
