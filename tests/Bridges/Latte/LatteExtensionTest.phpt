@@ -65,17 +65,9 @@ class LatteExtensionTest extends TestCase
 		$this->assertFile($scripts[1], 'src', 'WALDO', $expectedBarHash);
 		$this->assertFile($scripts[2], 'src', "FOO\nWALDO", $expectedFooPlusBarHash);
 		$this->assertFile($scripts[3], 'src', "FOO\nwaldo + fred+baz WALDO", $expectedFooPluStringPlusBarHash);
-
-		// Starting with Latte 3.0.17, unquoted strings can contain +, so these behave differently
-		if (Engine::VersionId >= 30017) {
-			$this->assertFile($scripts[4], 'src', 'BAR', $expectedBarPlusBazHash);
-			$this->assertFile($scripts[5], 'src', 'BAR', $expectedBarPlusBazHash);
-			$this->assertFile($scripts[6], 'src', 'BAR', $expectedBarPlusBazHash);
-		} else {
-			$this->assertFile($scripts[4], 'src', "WALDO\nbaz", $expectedBarPlusStringHash);
-			$this->assertFile($scripts[5], 'src', "WALDO\nbaz", $expectedBarPlusStringHash);
-			$this->assertFile($scripts[6], 'src', "WALDO\nbaz", $expectedBarPlusStringHash);
-		}
+		$this->assertFile($scripts[4], 'src', "WALDO\nbaz", $expectedBarPlusStringHash);
+		$this->assertFile($scripts[5], 'src', "WALDO\nbaz", $expectedBarPlusStringHash);
+		$this->assertFile($scripts[6], 'src', "WALDO\nbaz", $expectedBarPlusStringHash);
 		$this->assertFile($scripts[7], 'src', 'FRED', $expectedBarPlusBazWithSpacesHash);
 
 		$styles = $domQuery->find('link[rel=stylesheet]');
