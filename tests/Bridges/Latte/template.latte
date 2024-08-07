@@ -2,13 +2,9 @@
 {script bar empty-attribute, attribute => value}
 {script foo + bar empty-attribute, attribute => value}
 {script foo + 'waldo + fred+baz ' + bar empty-attribute, attribute => value}
-
-Parsed as a string 'bar+baz' in Latte 3.0.17 and newer, as 'bar' + 'baz' otherwise
 {script bar+baz empty-attribute, attribute => value}
 {script 'bar+baz' empty-attribute, attribute => value}
 {script bar + baz empty-attribute, attribute => value}
-
-Parsed as 'bar + baz' no matter the Latte version
 {script 'bar + baz' empty-attribute, attribute => value}
 
 {stylesheet foo empty-attribute, attribute => value}
