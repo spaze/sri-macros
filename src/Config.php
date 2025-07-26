@@ -16,7 +16,7 @@ class Config
 {
 
 	/** @internal separator between multiple resources */
-	public const BUILD_SEPARATOR = '+';
+	public const string BUILD_SEPARATOR = '+';
 
 	/** @var array<string, string|array{url: string, hash: string|array<int, string>}> */
 	private array $resources = [];
