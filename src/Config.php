@@ -10,7 +10,6 @@ use Spaze\SubresourceIntegrity\Exceptions\ShouldNotHappenException;
 use Spaze\SubresourceIntegrity\Exceptions\UnknownModeException;
 use Spaze\SubresourceIntegrity\Resource\FileResource;
 use Spaze\SubresourceIntegrity\Resource\StringResource;
-use stdClass;
 
 class Config
 {
@@ -33,7 +32,7 @@ class Config
 	/** @var array<int, HashingAlgo> */
 	private array $hashingAlgos = [];
 
-	/** @var array<string, array<string, stdClass>> */
+	/** @var array<string, array<string, LocalFile>> */
 	private array $localResources = [];
 
 
@@ -107,7 +106,7 @@ class Config
 			$url = sprintf(
 				'%s/%s',
 				rtrim($this->localPrefix['url'], '/'),
-				$this->localFile($resource, $targetHtmlElement)->url,
+				$this->localFile($resource, $targetHtmlElement)->getUrl(),
 			);
 		}
 		return $url;
@@ -132,7 +131,7 @@ class Config
 		} else {
 			$fileHashes = [];
 			foreach ($this->hashingAlgos as $algo) {
-				$filename = $this->localFile($resource, $targetHtmlElement)->filename;
+				$filename = $this->localFile($resource, $targetHtmlElement)->getFilename();
 				$hash = hash_file($algo->value, $filename, true);
 				if (!$hash) {
 					throw new HashFileException($algo, $filename);
@@ -160,7 +159,7 @@ class Config
 	 * @throws ShouldNotHappenException
 	 * @throws CannotGetFilePathForRemoteResourceException
 	 */
-	private function localFile(string|array $resource, ?HtmlElement $targetHtmlElement = null): stdClass
+	private function localFile(string|array $resource, ?HtmlElement $targetHtmlElement = null): LocalFile
 	{
 		$resourceKey = implode(self::BUILD_SEPARATOR, (array)$resource);
 		if (empty($this->localResources[$this->localMode->value][$resourceKey])) {
@@ -169,13 +168,13 @@ class Config
 					if (is_array($resource) || $this->isCombo($resource)) {
 						throw new InvalidResourceAliasException();
 					}
-					$data = new stdClass();
-					$data->url = $this->getFilePath($resource);
+					$url = $this->getFilePath($resource);
 					$cwd = getcwd();
 					if (!$cwd) {
 						throw new ShouldNotHappenException();
 					}
-					$data->filename = sprintf('%s/%s/%s', rtrim($cwd, '/'), trim($this->localPrefix['path'], '/'), $data->url);
+					$filename = sprintf('%s/%s/%s', rtrim($cwd, '/'), trim($this->localPrefix['path'], '/'), $url);
+					$localFile = new LocalFile($url, $filename);
 					break;
 				case LocalMode::Build:
 					$resources = [];
@@ -186,12 +185,12 @@ class Config
 							$resources[] = $this->getFileResource($value);
 						}
 					}
-					$data = $this->fileBuilder->build($resources, $this->localPrefix['path'], $this->localPrefix['build'], $targetHtmlElement);
+					$localFile = $this->fileBuilder->build($resources, $this->localPrefix['path'], $this->localPrefix['build'], $targetHtmlElement);
 					break;
 				default:
 					throw new UnknownModeException('Unknown local file mode: ' . $this->localMode->value);
 			}
-			$this->localResources[$this->localMode->value][$resourceKey] = $data;
+			$this->localResources[$this->localMode->value][$resourceKey] = $localFile;
 		}
 		return $this->localResources[$this->localMode->value][$resourceKey];
 	}
