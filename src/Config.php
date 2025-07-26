@@ -52,13 +52,11 @@ class Config
 	}
 
 
-	public function setLocalPrefix(stdClass $prefix): void
+	public function setLocalPrefix(string $urlPrefix, string $pathPrefix, string $buildPrefix): void
 	{
-		foreach (array_keys($this->localPrefix) as $key) {
-			if (isset($prefix->$key)) {
-				$this->localPrefix[$key] = $prefix->$key;
-			}
-		}
+		$this->localPrefix['url'] = $urlPrefix;
+		$this->localPrefix['path'] = $pathPrefix;
+		$this->localPrefix['build'] = $buildPrefix;
 	}
 
 

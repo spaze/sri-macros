@@ -41,7 +41,7 @@ class LatteExtensionTest extends TestCase
 			'bar + baz' => "{$assetsDir}/barPlusBaz.js",
 		]);
 		$config->setHashingAlgos(['sha256', 'sha384']);
-		$config->setLocalPrefix((object)['path' => $this->localPrefixDir, 'build' => $buildDir]);
+		$config->setLocalPrefix('', $this->localPrefixDir, $buildDir);
 
 		$engine = new Engine();
 		$engine->setTempDirectory($tempDir);
