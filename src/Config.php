@@ -7,7 +7,6 @@ use Spaze\SubresourceIntegrity\Exceptions\CannotGetFilePathForRemoteResourceExce
 use Spaze\SubresourceIntegrity\Exceptions\HashFileException;
 use Spaze\SubresourceIntegrity\Exceptions\InvalidResourceAliasException;
 use Spaze\SubresourceIntegrity\Exceptions\ShouldNotHappenException;
-use Spaze\SubresourceIntegrity\Exceptions\UnknownModeException;
 use Spaze\SubresourceIntegrity\Resource\FileResource;
 use Spaze\SubresourceIntegrity\Resource\StringResource;
 
@@ -187,8 +186,6 @@ class Config
 					}
 					$localFile = $this->fileBuilder->build($resources, $this->localPrefix['path'], $this->localPrefix['build'], $targetHtmlElement);
 					break;
-				default:
-					throw new UnknownModeException('Unknown local file mode: ' . $this->localMode->value);
 			}
 			$this->localResources[$this->localMode->value][$resourceKey] = $localFile;
 		}
