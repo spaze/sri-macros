@@ -7,6 +7,7 @@ namespace Spaze\tests\Bridges\Latte;
 
 use Latte\Engine;
 use Spaze\SubresourceIntegrity\Bridges\Latte\LatteExtension;
+use Spaze\SubresourceIntegrity\Bridges\Latte\Nodes\SriNodeFactory;
 use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\FileBuilder;
 use Spaze\SubresourceIntegrity\LocalMode;
@@ -45,7 +46,7 @@ class LatteExtensionTest extends TestCase
 
 		$engine = new Engine();
 		$engine->setTempDirectory($tempDir);
-		$engine->addExtension(new LatteExtension($config));
+		$engine->addExtension(new LatteExtension(new SriNodeFactory($config)));
 		$domQuery = DomQuery::fromHtml($engine->renderToString(__DIR__ . '/template.latte'));
 
 		$expectedFooHash = 'sha256-Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw= sha384-a7C/tKiJvZ9vnbfkuQL8yySB6ytEA+fXmUyO+YjOHmzk9Drl6DOZwoFwcqI1ciNN';
