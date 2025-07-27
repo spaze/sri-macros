@@ -41,15 +41,13 @@ class ConfigTest extends TestCase
 	public function setUp(): void
 	{
 		$this->config = new Config(new FileBuilder());
-		$this->config->setLocalPrefix((object)['path' => '.', 'build' => $this->buildDir]);
+		$this->config->setLocalPrefix('', '.', $this->buildDir);
 	}
 
 
 	public function testGetUrl(): void
 	{
-		$this->config->setLocalPrefix((object)[
-			'url' => '/chuck/norris/',
-		]);
+		$this->config->setLocalPrefix('/chuck/norris/', '', '');
 		$this->config->setResources([
 			'foo' => [
 				'url' => 'https://bar'
@@ -66,9 +64,7 @@ class ConfigTest extends TestCase
 
 	public function testGetFileResource(): void
 	{
-		$this->config->setLocalPrefix((object)[
-			'path' => '/chuck/norris/',
-		]);
+		$this->config->setLocalPrefix('', '/chuck/norris/', '');
 		$this->config->setResources([
 			'foo' => [
 				'url' => 'https://nope'
@@ -96,7 +92,7 @@ class ConfigTest extends TestCase
 	public function testGetMultipleHashes(): void
 	{
 		$this->config->setHashingAlgos(['sha256', 'sha512']);
-		$this->config->setLocalPrefix((object)['path' => 'foo/../assets']);
+		$this->config->setLocalPrefix('', 'foo/../assets', '');
 		$this->config->setResources(['foo' => 'foo.js']);
 		$hashes = [
 			self::HASH_FOO,
@@ -197,7 +193,7 @@ class ConfigTest extends TestCase
 	public function testBuildLocalModeNonExistingDir(): void
 	{
 		$this->config->setHashingAlgos(['sha256']);
-		$this->config->setLocalPrefix((object)['build' => "{$this->buildDir}/does/not/exist"]);
+		$this->config->setLocalPrefix('', '.', "{$this->buildDir}/does/not/exist");
 		$this->config->setResources(['foo' => '/assets/foo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
 		Assert::exception(function() {
@@ -271,10 +267,10 @@ class ConfigTest extends TestCase
 		$this->config->setLocalBuildPrefix('foobar');
 		Assert::same('./foobar', $this->config->getLocalPathBuildPrefix());
 
-		$this->config->setLocalPrefix((object)['path' => '/what/ever/', 'build' => '/lala/land/']);
+		$this->config->setLocalPrefix('', '/what/ever/', '/lala/land/');
 		Assert::same('/what/ever/lala/land', $this->config->getLocalPathBuildPrefix());
 
-		$this->config->setLocalPrefix((object)['path' => 'what/ever', 'build' => 'lala/land']);
+		$this->config->setLocalPrefix('', 'what/ever', 'lala/land');
 		Assert::same('what/ever/lala/land', $this->config->getLocalPathBuildPrefix());
 	}
 
