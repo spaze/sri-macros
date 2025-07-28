@@ -9,6 +9,7 @@ use Nette\DI\Definitions\FactoryDefinition;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Spaze\SubresourceIntegrity\Bridges\Latte\LatteExtension;
+use Spaze\SubresourceIntegrity\Bridges\Latte\Nodes\SriNodeFactory;
 use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\FileBuilder;
 use Spaze\SubresourceIntegrity\HashingAlgo;
@@ -56,6 +57,8 @@ class Extension extends CompilerExtension
 			->addSetup('setHashingAlgos', [$this->config->hashingAlgos]);
 		$builder->addDefinition($this->prefix('fileBuilder'))
 			->setType(FileBuilder::class);
+		$builder->addDefinition($this->prefix('nodeFactory'))
+			->setType(SriNodeFactory::class);
 	}
 
 
