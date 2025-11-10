@@ -38,7 +38,7 @@ class LatteExtension extends Extension
 	/**
 	 * @return list<string>
 	 */
-	public function getCacheKey(Engine $engine): mixed
+	public function getCacheKey(Engine $engine): array
 	{
 		return [
 			$this->sriConfig->getLocalUrlPrefix(),
