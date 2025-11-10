@@ -8,9 +8,9 @@ namespace Spaze\tests\Bridges\Latte;
 use Latte\Engine;
 use Spaze\SubresourceIntegrity\Bridges\Latte\LatteExtension;
 use Spaze\SubresourceIntegrity\Bridges\Latte\Nodes\SriNodeFactory;
-use Spaze\SubresourceIntegrity\Config;
 use Spaze\SubresourceIntegrity\FileBuilder;
 use Spaze\SubresourceIntegrity\LocalMode;
+use Spaze\SubresourceIntegrity\SriConfig;
 use Tester\Assert;
 use Tester\DomQuery;
 use Tester\Environment;
@@ -34,7 +34,7 @@ class LatteExtensionTest extends TestCase
 		$assetsDir = "../{$testsDir}/assets";
 		Helpers::purge($tempDir);
 
-		$config = new Config(new FileBuilder());
+		$config = new SriConfig(new FileBuilder());
 		$config->setLocalMode(LocalMode::Build);
 		$config->setResources([
 			'foo' => "{$assetsDir}/foo.js",

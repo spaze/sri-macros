@@ -10,7 +10,7 @@ use Spaze\SubresourceIntegrity\Exceptions\ShouldNotHappenException;
 use Spaze\SubresourceIntegrity\Resource\FileResource;
 use Spaze\SubresourceIntegrity\Resource\StringResource;
 
-class Config
+class SriConfig
 {
 
 	/** @internal separator between multiple resources */
