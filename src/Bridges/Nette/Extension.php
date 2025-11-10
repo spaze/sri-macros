@@ -52,7 +52,9 @@ class Extension extends CompilerExtension
 		$builder->addDefinition($this->prefix('config'))
 			->setType(Config::class)
 			->addSetup('setResources', [$this->config->resources])
-			->addSetup('setLocalPrefix', [$this->config->localPrefix->url, $this->config->localPrefix->path, $this->config->localPrefix->build])
+			->addSetup('setLocalUrlPrefix', [$this->config->localPrefix->url])
+			->addSetup('setLocalPathPrefix', [$this->config->localPrefix->path])
+			->addSetup('setLocalBuildPrefix', [$this->config->localPrefix->build])
 			->addSetup('setLocalMode', [$this->config->localMode])
 			->addSetup('setHashingAlgos', [$this->config->hashingAlgos]);
 		$builder->addDefinition($this->prefix('fileBuilder'))
