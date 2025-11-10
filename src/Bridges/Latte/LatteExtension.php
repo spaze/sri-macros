@@ -11,14 +11,14 @@ use Spaze\SubresourceIntegrity\Bridges\Latte\Nodes\ResourceUrlNode;
 use Spaze\SubresourceIntegrity\Bridges\Latte\Nodes\ScriptNode;
 use Spaze\SubresourceIntegrity\Bridges\Latte\Nodes\SriNodeFactory;
 use Spaze\SubresourceIntegrity\Bridges\Latte\Nodes\StyleSheetNode;
-use Spaze\SubresourceIntegrity\Config;
+use Spaze\SubresourceIntegrity\SriConfig;
 
 class LatteExtension extends Extension
 {
 
 	public function __construct(
 		private readonly SriNodeFactory $sriNodeFactory,
-		private readonly Config $sriConfig,
+		private readonly SriConfig $sriConfig,
 	) {
 	}
 

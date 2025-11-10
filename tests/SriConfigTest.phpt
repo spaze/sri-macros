@@ -20,14 +20,14 @@ use ValueError;
 require __DIR__ . '/bootstrap.php';
 
 /** @testCase */
-class ConfigTest extends TestCase
+class SriConfigTest extends TestCase
 {
 
 	private const HASH_FOO = 'sha256-Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw=';
 
 	private string $tempDir;
 	private string $buildDir;
-	private Config $config;
+	private SriConfig $config;
 
 
 	public function __construct()
@@ -40,7 +40,7 @@ class ConfigTest extends TestCase
 
 	public function setUp(): void
 	{
-		$this->config = new Config(new FileBuilder());
+		$this->config = new SriConfig(new FileBuilder());
 		$this->config->setLocalPathPrefix('.');
 		$this->config->setLocalBuildPrefix($this->buildDir);
 	}
@@ -284,4 +284,4 @@ class ConfigTest extends TestCase
 
 }
 
-(new ConfigTest())->run();
+(new SriConfigTest())->run();
