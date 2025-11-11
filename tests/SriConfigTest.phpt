@@ -51,7 +51,8 @@ class SriConfigTest extends TestCase
 		$this->config->setLocalUrlPrefix('/chuck/norris/');
 		$this->config->setResources([
 			'foo' => [
-				'url' => 'https://bar'
+				'url' => 'https://bar',
+				'hash' => 'CAFEBEEF',
 			],
 			'bar' => '/waldo/quux.js',
 		]);
@@ -68,7 +69,8 @@ class SriConfigTest extends TestCase
 		$this->config->setLocalPathPrefix('/chuck/norris/');
 		$this->config->setResources([
 			'foo' => [
-				'url' => 'https://nope'
+				'url' => 'https://nope',
+				'hash' => 'CAFEC0DE',
 			],
 			'bar' => '/waldo/quux.js',
 		]);
@@ -105,7 +107,7 @@ class SriConfigTest extends TestCase
 
 	public function testGetRemoteUrl(): void
 	{
-		$this->config->setResources(['foo' => ['url' => 'pluto://goofy']]);
+		$this->config->setResources(['foo' => ['url' => 'pluto://goofy', 'hash' => 'GoofusDDawg']]);
 		Assert::same('pluto://goofy', $this->config->getUrl('foo'));
 		Assert::same('pluto://goofy', $this->config->getUrl('foo', HtmlElement::Link));
 	}
@@ -116,7 +118,7 @@ class SriConfigTest extends TestCase
 	 */
 	public function testGetRemoteUrlInvalidCharacters(): void
 	{
-		$this->config->setResources(['foo+bar' => ['url' => 'pluto://goofy']]);
+		$this->config->setResources(['foo+bar' => ['url' => 'pluto://goofy', 'hash' => 'GoofusDDawg']]);
 		$this->config->getUrl('foo+bar');
 	}
 
@@ -257,7 +259,7 @@ class SriConfigTest extends TestCase
 				$this->config->setLocalMode('foo');
 			},
 			ValueError::class,
-			PHP_VERSION_ID < 80200 ? '"foo" is not a valid backing value for enum "Spaze\SubresourceIntegrity\LocalMode"' : '"foo" is not a valid backing value for enum Spaze\SubresourceIntegrity\LocalMode',
+			'"foo" is not a valid backing value for enum Spaze\SubresourceIntegrity\LocalMode',
 		);
 	}
 
