@@ -23,7 +23,7 @@ require __DIR__ . '/bootstrap.php';
 class SriConfigTest extends TestCase
 {
 
-	private const HASH_FOO = 'sha256-Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw=';
+	private const string HASH_FOO = 'sha256-Fwa1wY5DWAQbRjmV78MPj3IXZvqw4BjVDYWXi0bfATw=';
 
 	private string $tempDir;
 	private string $buildDir;
@@ -99,7 +99,7 @@ class SriConfigTest extends TestCase
 		$this->config->setResources(['foo' => 'foo.js']);
 		$hashes = [
 			self::HASH_FOO,
-			'sha512-Mz6AdmkKsEt6DFZ+hhfQVKEoZZISIT97SmgJEwKAupO+tWVfhgGnb59VxH3W49/Gf/WfQIiZXHsAHMafjAtqyg=='
+			'sha512-Mz6AdmkKsEt6DFZ+hhfQVKEoZZISIT97SmgJEwKAupO+tWVfhgGnb59VxH3W49/Gf/WfQIiZXHsAHMafjAtqyg==',
 		];
 		Assert::same(implode(' ', $hashes), $this->config->getHash('foo'));
 	}
@@ -128,7 +128,7 @@ class SriConfigTest extends TestCase
 		$this->config->setResources([
 			'foo' => [
 				'url' => 'pluto://goofy',
-				'hash' => 'sha123-pluto'
+				'hash' => 'sha123-pluto',
 			],
 		]);
 		Assert::same('pluto://goofy', $this->config->getUrl('foo'));
@@ -146,7 +146,7 @@ class SriConfigTest extends TestCase
 		$this->config->setResources([
 			'foo+bar' => [
 				'url' => 'pluto://goofy',
-				'hash' => 'sha123-pluto'
+				'hash' => 'sha123-pluto',
 			],
 		]);
 		$this->config->getHash('foo+bar');
@@ -200,7 +200,7 @@ class SriConfigTest extends TestCase
 		$this->config->setLocalBuildPrefix("{$this->buildDir}/does/not/exist");
 		$this->config->setResources(['foo' => '/assets/foo.js']);
 		$this->config->setLocalMode(LocalMode::Build);
-		Assert::exception(function() {
+		Assert::exception(function () {
 			Assert::same(self::HASH_FOO, $this->config->getHash('foo'));
 		}, DirectoryNotWritableException::class);
 	}
@@ -231,7 +231,7 @@ class SriConfigTest extends TestCase
 	{
 		$this->config->setHashingAlgos(['sha256']);
 		$this->config->setLocalMode(LocalMode::Build);
-		Assert::exception(function() {
+		Assert::exception(function () {
 			$this->config->getHash('foobar');
 		}, UnknownExtensionException::class);
 		Assert::same('sha256-w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI=', $this->config->getHash('foobar', HtmlElement::Script));
